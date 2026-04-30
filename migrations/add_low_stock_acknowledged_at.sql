@@ -1,0 +1,10 @@
+-- Add lowStockAcknowledgedAt field to items table
+-- This allows users to acknowledge/dismiss low stock notifications temporarily
+-- Notifications will reappear when inventory is updated
+--
+-- STATUS: APPLIED TO init.sql
+-- The following field and index are already in init.sql:
+-- - items.low_stock_acknowledged_at TIMESTAMP
+-- - idx_items_low_stock_ack ON items(low_stock_acknowledged_at) WHERE low_stock_acknowledged_at IS NOT NULL
+--
+-- This file is retained for documentation purposes only

@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="203" failures="24" errors="0" time="25.355">
+  <testsuite name="Complex Integration Test Suite" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="20.319" tests="13">
+    <testcase classname="Complex Integration Test Suite Stock Management and Sales Integration should prevent overselling when stock is insufficient" name="Complex Integration Test Suite Stock Management and Sales Integration should prevent overselling when stock is insufficient" time="0.056">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Stock Management and Sales Integration should successfully create sale when stock is sufficient and update stock levels" name="Complex Integration Test Suite Stock Management and Sales Integration should successfully create sale when stock is sufficient and update stock levels" time="0.015">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Multiple Item Sales and Calculations should correctly calculate totals for multi-item sales with VAT" name="Complex Integration Test Suite Multiple Item Sales and Calculations should correctly calculate totals for multi-item sales with VAT" time="0.093">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Cross-Feature Data Integrity should maintain data consistency when retrieving sales by different methods" name="Complex Integration Test Suite Cross-Feature Data Integrity should maintain data consistency when retrieving sales by different methods" time="0.015">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Error Handling and Recovery should handle invalid item IDs gracefully" name="Complex Integration Test Suite Error Handling and Recovery should handle invalid item IDs gracefully" time="0.005">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Authentication and Authorization Edge Cases should consistently reject unauthorized requests across all endpoints" name="Complex Integration Test Suite Authentication and Authorization Edge Cases should consistently reject unauthorized requests across all endpoints" time="0.013">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Performance and Load Characteristics should handle reasonable load without degradation" name="Complex Integration Test Suite Performance and Load Characteristics should handle reasonable load without degradation" time="0.026">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Compound Business Logic Integration should handle complex multi-step workflow: create sale, check stock, create another sale" name="Complex Integration Test Suite Compound Business Logic Integration should handle complex multi-step workflow: create sale, check stock, create another sale" time="0.052">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Compound Business Logic Integration should handle mixed success/failure scenarios in complex transactions" name="Complex Integration Test Suite Compound Business Logic Integration should handle mixed success/failure scenarios in complex transactions" time="0.038">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Compound Business Logic Integration should maintain system consistency under rapid concurrent operations" name="Complex Integration Test Suite Compound Business Logic Integration should maintain system consistency under rapid concurrent operations" time="0.018">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Data Validation and Edge Cases should handle extreme values and boundary conditions" name="Complex Integration Test Suite Data Validation and Edge Cases should handle extreme values and boundary conditions" time="0.019">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite Data Validation and Edge Cases should validate business rules across different operations" name="Complex Integration Test Suite Data Validation and Edge Cases should validate business rules across different operations" time="0.027">
+    </testcase>
+    <testcase classname="Complex Integration Test Suite System Resilience and Recovery should gracefully handle malformed requests and maintain stability" name="Complex Integration Test Suite System Resilience and Recovery should gracefully handle malformed requests and maintain stability" time="0.016">
+    </testcase>
+  </testsuite>
+  <testsuite name="Quotes Functionality" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="20.414" tests="9">
+    <testcase classname="Quotes Functionality createQuote should create a quote with multiple items and correct calculations" name="Quotes Functionality createQuote should create a quote with multiple items and correct calculations" time="0.031">
+    </testcase>
+    <testcase classname="Quotes Functionality createQuote should generate unique quote IDs" name="Quotes Functionality createQuote should generate unique quote IDs" time="0.003">
+    </testcase>
+    <testcase classname="Quotes Functionality createQuote should handle quotes with complex VAT calculations" name="Quotes Functionality createQuote should handle quotes with complex VAT calculations" time="0.002">
+    </testcase>
+    <testcase classname="Quotes Functionality getQuotes should retrieve all quotes with details" name="Quotes Functionality getQuotes should retrieve all quotes with details" time="0.002">
+    </testcase>
+    <testcase classname="Quotes Functionality getQuotes should paginate quotes correctly" name="Quotes Functionality getQuotes should paginate quotes correctly" time="0.001">
+    </testcase>
+    <testcase classname="Quotes Functionality getQuotes should filter quotes by status" name="Quotes Functionality getQuotes should filter quotes by status" time="0.003">
+    </testcase>
+    <testcase classname="Quotes Functionality processQuote should convert quote to sale and update stock" name="Quotes Functionality processQuote should convert quote to sale and update stock" time="0.005">
+    </testcase>
+    <testcase classname="Quotes Functionality processQuote should not process non-draft quotes" name="Quotes Functionality processQuote should not process non-draft quotes" time="0.067">
+    </testcase>
+    <testcase classname="Quotes Functionality VAT calculations validation should handle VAT-inclusive pricing correctly" name="Quotes Functionality VAT calculations validation should handle VAT-inclusive pricing correctly" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Charge Code Exclusions" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="20.51" tests="11">
+    <testcase classname="Charge Code Exclusions Exclusion Management should create charge code exclusions" name="Charge Code Exclusions Exclusion Management should create charge code exclusions" time="0.007">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Exclusion Management should check if charge code is excluded for category" name="Charge Code Exclusions Exclusion Management should check if charge code is excluded for category" time="0.001">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Exclusion Management should delete charge code exclusions" name="Charge Code Exclusions Exclusion Management should delete charge code exclusions" time="0.006">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Exclusion Management should return empty array for charge code with no exclusions" name="Charge Code Exclusions Exclusion Management should return empty array for charge code with no exclusions" time="0">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Exclusion Management should return empty array for non-existent charge code" name="Charge Code Exclusions Exclusion Management should return empty array for non-existent charge code" time="0.008">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Sales Validation with Exclusions should allow sales when no exclusions exist" name="Charge Code Exclusions Sales Validation with Exclusions should allow sales when no exclusions exist" time="0.002">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Sales Validation with Exclusions should detect exclusion violations" name="Charge Code Exclusions Sales Validation with Exclusions should detect exclusion violations" time="0">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Sales Validation with Exclusions should allow purchases from non-excluded categories" name="Charge Code Exclusions Sales Validation with Exclusions should allow purchases from non-excluded categories" time="0.001">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Sales Validation with Exclusions should handle multiple exclusions correctly" name="Charge Code Exclusions Sales Validation with Exclusions should handle multiple exclusions correctly" time="0.008">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Integration with Existing Charge Code Validation should work alongside existing charge code validation" name="Charge Code Exclusions Integration with Existing Charge Code Validation should work alongside existing charge code validation" time="0.001">
+    </testcase>
+    <testcase classname="Charge Code Exclusions Integration with Existing Charge Code Validation should handle expired charge codes with exclusions" name="Charge Code Exclusions Integration with Existing Charge Code Validation should handle expired charge codes with exclusions" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="JSON Order Import Tests" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:50" time="0.243" tests="13">
+    <testcase classname="JSON Order Import Tests JSON Order Validation should validate required string fields" name="JSON Order Import Tests JSON Order Validation should validate required string fields" time="0.039">
+    </testcase>
+    <testcase classname="JSON Order Import Tests JSON Order Validation should validate numeric fields" name="JSON Order Import Tests JSON Order Validation should validate numeric fields" time="0.004">
+    </testcase>
+    <testcase classname="JSON Order Import Tests JSON Order Validation should validate VAT calculations" name="JSON Order Import Tests JSON Order Validation should validate VAT calculations" time="0.001">
+    </testcase>
+    <testcase classname="JSON Order Import Tests JSON Order Validation should validate order structure" name="JSON Order Import Tests JSON Order Validation should validate order structure" time="0.002">
+    </testcase>
+    <testcase classname="JSON Order Import Tests JSON Order Validation should handle special characters in text fields" name="JSON Order Import Tests JSON Order Validation should handle special characters in text fields" time="0">
+    </testcase>
+    <testcase classname="JSON Order Import Tests JSON Order Validation should handle null/undefined optional fields gracefully" name="JSON Order Import Tests JSON Order Validation should handle null/undefined optional fields gracefully" time="0">
+    </testcase>
+    <testcase classname="JSON Order Import Tests JSON Order Validation should validate large orders" name="JSON Order Import Tests JSON Order Validation should validate large orders" time="0.002">
+    </testcase>
+    <testcase classname="JSON Order Import Tests Order Calculation Utilities should calculate order totals correctly" name="JSON Order Import Tests Order Calculation Utilities should calculate order totals correctly" time="0.001">
+    </testcase>
+    <testcase classname="JSON Order Import Tests Order Calculation Utilities should handle zero quantities and costs" name="JSON Order Import Tests Order Calculation Utilities should handle zero quantities and costs" time="0">
+    </testcase>
+    <testcase classname="JSON Order Import Tests Order Calculation Utilities should handle different VAT rates" name="JSON Order Import Tests Order Calculation Utilities should handle different VAT rates" time="0.001">
+    </testcase>
+    <testcase classname="JSON Order Import Tests SKU Generation should generate unique SKUs" name="JSON Order Import Tests SKU Generation should generate unique SKUs" time="0.128">
+    </testcase>
+    <testcase classname="JSON Order Import Tests SKU Generation should include prefix in generated SKU" name="JSON Order Import Tests SKU Generation should include prefix in generated SKU" time="0.001">
+    </testcase>
+    <testcase classname="JSON Order Import Tests SKU Generation should handle empty prefix" name="JSON Order Import Tests SKU Generation should handle empty prefix" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Basic Test" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:50" time="0.087" tests="2">
+    <testcase classname="Basic Test should run a basic test" name="Basic Test should run a basic test" time="0.001">
+    </testcase>
+    <testcase classname="Basic Test should test basic math operations" name="Basic Test should test basic math operations" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="Sales Functionality" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="20.878" tests="17">
+    <testcase classname="Sales Functionality createSale should create a sale with valid data" name="Sales Functionality createSale should create a sale with valid data" time="0.012">
+    </testcase>
+    <testcase classname="Sales Functionality createSale should generate unique sale IDs" name="Sales Functionality createSale should generate unique sale IDs" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality createSale should handle sales with customer information" name="Sales Functionality createSale should handle sales with customer information" time="0.002">
+    </testcase>
+    <testcase classname="Sales Functionality getSales should retrieve all sales" name="Sales Functionality getSales should retrieve all sales" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality getSales should paginate sales correctly" name="Sales Functionality getSales should paginate sales correctly" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality getSales should filter sales by date range" name="Sales Functionality getSales should filter sales by date range" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality getSales should filter sales by charge code" name="Sales Functionality getSales should filter sales by charge code" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality getSales should filter sales by status" name="Sales Functionality getSales should filter sales by status" time="0.002">
+    </testcase>
+    <testcase classname="Sales Functionality getSalesByChargeCode should get sales analytics by charge code" name="Sales Functionality getSalesByChargeCode should get sales analytics by charge code" time="0.002">
+    </testcase>
+    <testcase classname="Sales Functionality getSalesByChargeCode should filter charge code analytics by date" name="Sales Functionality getSalesByChargeCode should filter charge code analytics by date" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality getSalesByChargeCode should return empty results for future date range" name="Sales Functionality getSalesByChargeCode should return empty results for future date range" time="0">
+    </testcase>
+    <testcase classname="Sales Functionality getSalesByChargeCode should aggregate department sales correctly" name="Sales Functionality getSalesByChargeCode should aggregate department sales correctly" time="0.002">
+    </testcase>
+    <testcase classname="Sales Functionality markSaleAsPaid should successfully mark a completed sale as paid" name="Sales Functionality markSaleAsPaid should successfully mark a completed sale as paid" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality markSaleAsPaid should be idempotent - marking an already paid sale as paid should not cause errors" name="Sales Functionality markSaleAsPaid should be idempotent - marking an already paid sale as paid should not cause errors" time="0">
+    </testcase>
+    <testcase classname="Sales Functionality markSaleAsPaid should throw error when trying to mark non-existent sale as paid" name="Sales Functionality markSaleAsPaid should throw error when trying to mark non-existent sale as paid" time="0.049">
+    </testcase>
+    <testcase classname="Sales Functionality markSaleAsPaid should not affect other sale properties when marking as paid" name="Sales Functionality markSaleAsPaid should not affect other sale properties when marking as paid" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality markSaleAsPaid should prevent double counting in reports - paid sales should be distinguishable" name="Sales Functionality markSaleAsPaid should prevent double counting in reports - paid sales should be distinguishable" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Sales API Integration Tests" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:50" time="0.499" tests="6">
+    <testcase classname="Sales API Integration Tests POST /api/sales should create a sale with valid data" name="Sales API Integration Tests POST /api/sales should create a sale with valid data" time="0.105">
+    </testcase>
+    <testcase classname="Sales API Integration Tests POST /api/sales should return 400 for missing charge code" name="Sales API Integration Tests POST /api/sales should return 400 for missing charge code" time="0.008">
+    </testcase>
+    <testcase classname="Sales API Integration Tests GET /api/sales should return empty array initially" name="Sales API Integration Tests GET /api/sales should return empty array initially" time="0.004">
+    </testcase>
+    <testcase classname="Sales API Integration Tests GET /api/sales/:id should return sale by ID" name="Sales API Integration Tests GET /api/sales/:id should return sale by ID" time="0.005">
+    </testcase>
+    <testcase classname="Sales API Integration Tests GET /api/sales/:id should return 404 for non-existent sale" name="Sales API Integration Tests GET /api/sales/:id should return 404 for non-existent sale" time="0.008">
+    </testcase>
+    <testcase classname="Sales API Integration Tests GET /health should return health status" name="Sales API Integration Tests GET /health should return health status" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="Sales API with Charge Code Exclusions" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.195" tests="7">
+    <testcase classname="Sales API with Charge Code Exclusions Sales Validation Integration should allow sales with valid charge code and no exclusions" name="Sales API with Charge Code Exclusions Sales Validation Integration should allow sales with valid charge code and no exclusions" time="0.009">
+    </testcase>
+    <testcase classname="Sales API with Charge Code Exclusions Sales Validation Integration should reject sales with invalid charge code" name="Sales API with Charge Code Exclusions Sales Validation Integration should reject sales with invalid charge code" time="0.001">
+    </testcase>
+    <testcase classname="Sales API with Charge Code Exclusions Sales Validation Integration should reject sales with expired charge code" name="Sales API with Charge Code Exclusions Sales Validation Integration should reject sales with expired charge code" time="0.045">
+    </testcase>
+    <testcase classname="Sales API with Charge Code Exclusions Sales Validation Integration should reject sales when charge code is excluded for item category" name="Sales API with Charge Code Exclusions Sales Validation Integration should reject sales when charge code is excluded for item category" time="0.002">
+    </testcase>
+    <testcase classname="Sales API with Charge Code Exclusions Sales Validation Integration should allow sales for non-excluded categories" name="Sales API with Charge Code Exclusions Sales Validation Integration should allow sales for non-excluded categories" time="0.001">
+    </testcase>
+    <testcase classname="Sales API with Charge Code Exclusions Sales Validation Integration should handle mixed cart with some excluded items" name="Sales API with Charge Code Exclusions Sales Validation Integration should handle mixed cart with some excluded items" time="0.001">
+    </testcase>
+    <testcase classname="Sales API with Charge Code Exclusions Sales Validation Integration should work with multiple exclusions on the same charge code" name="Sales API with Charge Code Exclusions Sales Validation Integration should work with multiple exclusions on the same charge code" time="0.005">
+    </testcase>
+  </testsuite>
+  <testsuite name="Sales Functionality with Stock Management" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.258" tests="9">
+    <testcase classname="Sales Functionality with Stock Management createSale with multiple items should create sale with multiple items and verify stock reductions" name="Sales Functionality with Stock Management createSale with multiple items should create sale with multiple items and verify stock reductions" time="0.018">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management createSale with multiple items should handle complex VAT calculations correctly" name="Sales Functionality with Stock Management createSale with multiple items should handle complex VAT calculations correctly" time="0.002">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management createSale with multiple items should prevent sales when insufficient stock" name="Sales Functionality with Stock Management createSale with multiple items should prevent sales when insufficient stock" time="0.042">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management stock movement tracking should track all stock movements with complete audit trail" name="Sales Functionality with Stock Management stock movement tracking should track all stock movements with complete audit trail" time="0.002">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management stock movement tracking should maintain referential integrity in movements" name="Sales Functionality with Stock Management stock movement tracking should maintain referential integrity in movements" time="0.001">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management sales reporting and analytics should retrieve sales with proper pagination and filtering" name="Sales Functionality with Stock Management sales reporting and analytics should retrieve sales with proper pagination and filtering" time="0.004">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management sales reporting and analytics should filter sales by charge code" name="Sales Functionality with Stock Management sales reporting and analytics should filter sales by charge code" time="0.003">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management sales reporting and analytics should calculate correct totals across multiple sales" name="Sales Functionality with Stock Management sales reporting and analytics should calculate correct totals across multiple sales" time="0.005">
+    </testcase>
+    <testcase classname="Sales Functionality with Stock Management integration with quote processing should maintain data consistency when processing quote to sale" name="Sales Functionality with Stock Management integration with quote processing should maintain data consistency when processing quote to sale" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="VAT Items Basic Test" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.23" tests="2">
+    <testcase classname="VAT Items Basic Test Item Creation with VAT should create an item with VAT included" name="VAT Items Basic Test Item Creation with VAT should create an item with VAT included" time="0.155">
+    </testcase>
+    <testcase classname="VAT Items Basic Test Item Creation with VAT should verify VAT is visible in items list" name="VAT Items Basic Test Item Creation with VAT should verify VAT is visible in items list" time="0.051">
+    </testcase>
+  </testsuite>
+  <testsuite name="VAT in Sales Functionality" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.372" tests="5">
+    <testcase classname="VAT in Sales Functionality Sales with VAT-Included Items should create a sale with correct VAT calculation for VAT-included item" name="VAT in Sales Functionality Sales with VAT-Included Items should create a sale with correct VAT calculation for VAT-included item" time="0.103">
+    </testcase>
+    <testcase classname="VAT in Sales Functionality Sales with VAT-Included Items should create a sale with multiple VAT-included items" name="VAT in Sales Functionality Sales with VAT-Included Items should create a sale with multiple VAT-included items" time="0.05">
+    </testcase>
+    <testcase classname="VAT in Sales Functionality Sales with VAT-Excluded Items should create a sale with correct VAT calculation for VAT-excluded item" name="VAT in Sales Functionality Sales with VAT-Excluded Items should create a sale with correct VAT calculation for VAT-excluded item" time="0.023">
+    </testcase>
+    <testcase classname="VAT in Sales Functionality Sales with Mixed VAT Configurations should create a sale with items having different VAT rates" name="VAT in Sales Functionality Sales with Mixed VAT Configurations should create a sale with items having different VAT rates" time="0.051">
+    </testcase>
+    <testcase classname="VAT in Sales Functionality VAT Information Persistence in Sales should retrieve sales with VAT information intact" name="VAT in Sales Functionality VAT Information Persistence in Sales should retrieve sales with VAT information intact" time="0.126">
+    </testcase>
+  </testsuite>
+  <testsuite name="Mark as Paid API Integration" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:50" time="0.863" tests="3">
+    <testcase classname="Mark as Paid API Integration PATCH /api/sales/:id/mark-paid should successfully mark a sale as paid via API" name="Mark as Paid API Integration PATCH /api/sales/:id/mark-paid should successfully mark a sale as paid via API" time="0.169">
+    </testcase>
+    <testcase classname="Mark as Paid API Integration PATCH /api/sales/:id/mark-paid should return 404 for non-existent sale" name="Mark as Paid API Integration PATCH /api/sales/:id/mark-paid should return 404 for non-existent sale" time="0.043">
+    </testcase>
+    <testcase classname="Mark as Paid API Integration PATCH /api/sales/:id/mark-paid should return 400 for invalid sale ID" name="Mark as Paid API Integration PATCH /api/sales/:id/mark-paid should return 400 for invalid sale ID" time="0.003">
+    </testcase>
+  </testsuite>
+  <testsuite name="Vendor System" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.482" tests="13">
+    <testcase classname="Vendor System Supplier Management should create a new supplier" name="Vendor System Supplier Management should create a new supplier" time="0.005">
+    </testcase>
+    <testcase classname="Vendor System Supplier Management should retrieve all suppliers" name="Vendor System Supplier Management should retrieve all suppliers" time="0.01">
+    </testcase>
+    <testcase classname="Vendor System Supplier Management should update supplier information" name="Vendor System Supplier Management should update supplier information" time="0">
+    </testcase>
+    <testcase classname="Vendor System Supplier Management should delete a supplier" name="Vendor System Supplier Management should delete a supplier" time="0">
+    </testcase>
+    <testcase classname="Vendor System Item-Supplier Relationships (Sources) should create a source relationship between supplier and item" name="Vendor System Item-Supplier Relationships (Sources) should create a source relationship between supplier and item" time="0.001">
+    </testcase>
+    <testcase classname="Vendor System Item-Supplier Relationships (Sources) should get supplier details with supplied items" name="Vendor System Item-Supplier Relationships (Sources) should get supplier details with supplied items" time="0.001">
+    </testcase>
+    <testcase classname="Vendor System Item-Supplier Relationships (Sources) should remove item from supplier" name="Vendor System Item-Supplier Relationships (Sources) should remove item from supplier" time="0">
+    </testcase>
+    <testcase classname="Vendor System Orders and Vendor Relationships should create an order with multiple items from a supplier" name="Vendor System Orders and Vendor Relationships should create an order with multiple items from a supplier" time="0.001">
+    </testcase>
+    <testcase classname="Vendor System Orders and Vendor Relationships should mark order as received and update item relationships" name="Vendor System Orders and Vendor Relationships should mark order as received and update item relationships" time="0.001">
+    </testcase>
+    <testcase classname="Vendor System Orders and Vendor Relationships should show that a vendor stocks an item after receiving an order" name="Vendor System Orders and Vendor Relationships should show that a vendor stocks an item after receiving an order" time="0">
+    </testcase>
+    <testcase classname="Vendor System Orders and Vendor Relationships should track order history with a supplier" name="Vendor System Orders and Vendor Relationships should track order history with a supplier" time="0">
+    </testcase>
+    <testcase classname="Vendor System Orders and Vendor Relationships should calculate total spending with a supplier" name="Vendor System Orders and Vendor Relationships should calculate total spending with a supplier" time="0">
+    </testcase>
+    <testcase classname="Vendor System Vendor Performance Analytics should track supplier reliability (order fulfillment rate)" name="Vendor System Vendor Performance Analytics should track supplier reliability (order fulfillment rate)" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="LUStores E2E Test Suite" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.562" tests="19">
+    <testcase classname="LUStores E2E Test Suite Health and System Status should return system health status" name="LUStores E2E Test Suite Health and System Status should return system health status" time="0.027">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Health and System Status should return API documentation" name="LUStores E2E Test Suite Health and System Status should return API documentation" time="0.004">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Authentication Flow should reject unauthenticated requests to protected routes" name="LUStores E2E Test Suite Authentication Flow should reject unauthenticated requests to protected routes" time="0.003">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Authentication Flow should allow access with valid authentication" name="LUStores E2E Test Suite Authentication Flow should allow access with valid authentication" time="0.004">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Sales API End-to-End POST /api/sales should create a complete sale with all required fields" name="LUStores E2E Test Suite Sales API End-to-End POST /api/sales should create a complete sale with all required fields" time="0.012">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Sales API End-to-End POST /api/sales should validate required fields and return appropriate errors" name="LUStores E2E Test Suite Sales API End-to-End POST /api/sales should validate required fields and return appropriate errors" time="0.004">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Sales API End-to-End GET /api/sales should return paginated sales list with metadata" name="LUStores E2E Test Suite Sales API End-to-End GET /api/sales should return paginated sales list with metadata" time="0.004">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Sales API End-to-End GET /api/sales should filter sales by date range" name="LUStores E2E Test Suite Sales API End-to-End GET /api/sales should filter sales by date range" time="0.002">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Sales API End-to-End GET /api/sales/:id should return detailed sale information including line items" name="LUStores E2E Test Suite Sales API End-to-End GET /api/sales/:id should return detailed sale information including line items" time="0.005">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Sales API End-to-End GET /api/sales/:id should return 404 for non-existent sale" name="LUStores E2E Test Suite Sales API End-to-End GET /api/sales/:id should return 404 for non-existent sale" time="0.002">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Inventory API End-to-End GET /api/items should return available items with stock information" name="LUStores E2E Test Suite Inventory API End-to-End GET /api/items should return available items with stock information" time="0.001">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Inventory API End-to-End GET /api/items should filter items by category" name="LUStores E2E Test Suite Inventory API End-to-End GET /api/items should filter items by category" time="0.002">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Inventory API End-to-End GET /api/categories should return all available categories" name="LUStores E2E Test Suite Inventory API End-to-End GET /api/categories should return all available categories" time="0.002">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Stock Management should update stock levels after sale creation" name="LUStores E2E Test Suite Stock Management should update stock levels after sale creation" time="0.005">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Stock Management should prevent overselling when stock is insufficient" name="LUStores E2E Test Suite Stock Management should prevent overselling when stock is insufficient" time="0.03">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Error Handling should handle database connection errors gracefully" name="LUStores E2E Test Suite Error Handling should handle database connection errors gracefully" time="0.001">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Error Handling should return proper JSON error responses" name="LUStores E2E Test Suite Error Handling should return proper JSON error responses" time="0.002">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Performance should respond to health check within reasonable time" name="LUStores E2E Test Suite Performance should respond to health check within reasonable time" time="0.002">
+    </testcase>
+    <testcase classname="LUStores E2E Test Suite Performance should handle concurrent requests efficiently" name="LUStores E2E Test Suite Performance should handle concurrent requests efficiently" time="0.011">
+    </testcase>
+  </testsuite>
+  <testsuite name="VAT Functionality for Items" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.827" tests="12">
+    <testcase classname="VAT Functionality for Items Item Creation with VAT should create an item with VAT included (default behavior)" name="VAT Functionality for Items Item Creation with VAT should create an item with VAT included (default behavior)" time="0.07">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Item Creation with VAT should create an item with VAT excluded" name="VAT Functionality for Items Item Creation with VAT should create an item with VAT excluded" time="0.01">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Item Creation with VAT should create an item with custom VAT rate" name="VAT Functionality for Items Item Creation with VAT should create an item with custom VAT rate" time="0.01">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Item Creation with VAT should create an item with zero VAT rate" name="VAT Functionality for Items Item Creation with VAT should create an item with zero VAT rate" time="0.01">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Item Updates with VAT should update VAT rate for an existing item" name="VAT Functionality for Items Item Updates with VAT should update VAT rate for an existing item" time="0.019">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Item Updates with VAT should update VAT inclusion flag for an existing item" name="VAT Functionality for Items Item Updates with VAT should update VAT inclusion flag for an existing item" time="0.015">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Item Updates with VAT should update both VAT rate and inclusion simultaneously" name="VAT Functionality for Items Item Updates with VAT should update both VAT rate and inclusion simultaneously" time="0.015">
+    </testcase>
+    <testcase classname="VAT Functionality for Items VAT Display and Calculation Logic should verify VAT calculation for VAT-included items" name="VAT Functionality for Items VAT Display and Calculation Logic should verify VAT calculation for VAT-included items" time="0.005">
+    </testcase>
+    <testcase classname="VAT Functionality for Items VAT Display and Calculation Logic should verify VAT calculation for VAT-excluded items" name="VAT Functionality for Items VAT Display and Calculation Logic should verify VAT calculation for VAT-excluded items" time="0.007">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Items List with VAT Information should retrieve all items with VAT information intact" name="VAT Functionality for Items Items List with VAT Information should retrieve all items with VAT information intact" time="0.027">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Items List with VAT Information should verify VAT information is preserved in search results" name="VAT Functionality for Items Items List with VAT Information should verify VAT information is preserved in search results" time="0.022">
+    </testcase>
+    <testcase classname="VAT Functionality for Items Default VAT Values should use default VAT values when not specified" name="VAT Functionality for Items Default VAT Values should use default VAT values when not specified" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="Role Management and Settings System" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="21.923" tests="19">
+    <testcase classname="Role Management and Settings System Basic Role Permissions should allow basic users to view inventory and sales" name="Role Management and Settings System Basic Role Permissions should allow basic users to view inventory and sales" time="0.224">
+    </testcase>
+    <testcase classname="Role Management and Settings System Basic Role Permissions should NOT allow basic users to add inventory or manage categories" name="Role Management and Settings System Basic Role Permissions should NOT allow basic users to add inventory or manage categories" time="0.047">
+    </testcase>
+    <testcase classname="Role Management and Settings System Basic Role Permissions should NOT allow basic users to access admin functions" name="Role Management and Settings System Basic Role Permissions should NOT allow basic users to access admin functions" time="0.05">
+    </testcase>
+    <testcase classname="Role Management and Settings System Superuser Role Permissions should allow superusers to manage inventory and process sales" name="Role Management and Settings System Superuser Role Permissions should allow superusers to manage inventory and process sales" time="0.053">
+    </testcase>
+    <testcase classname="Role Management and Settings System Superuser Role Permissions should allow superusers to manage orders and vendors" name="Role Management and Settings System Superuser Role Permissions should allow superusers to manage orders and vendors" time="0.033">
+    </testcase>
+    <testcase classname="Role Management and Settings System Superuser Role Permissions should allow superusers to generate reports but NOT manage users" name="Role Management and Settings System Superuser Role Permissions should allow superusers to generate reports but NOT manage users" time="0.03">
+    </testcase>
+    <testcase classname="Role Management and Settings System Admin Role Permissions should allow admins to perform all operations" name="Role Management and Settings System Admin Role Permissions should allow admins to perform all operations" time="0.034">
+    </testcase>
+    <testcase classname="Role Management and Settings System Permission Override System should allow granting specific permissions to users" name="Role Management and Settings System Permission Override System should allow granting specific permissions to users" time="0.026">
+    </testcase>
+    <testcase classname="Role Management and Settings System Permission Override System should allow revoking permissions from users" name="Role Management and Settings System Permission Override System should allow revoking permissions from users" time="0.024">
+    </testcase>
+    <testcase classname="Role Management and Settings System Permission Override System should maintain permission history" name="Role Management and Settings System Permission Override System should maintain permission history" time="0.024">
+    </testcase>
+    <testcase classname="Role Management and Settings System System Settings Management should manage role-based permission settings" name="Role Management and Settings System System Settings Management should manage role-based permission settings" time="0.019">
+    </testcase>
+    <testcase classname="Role Management and Settings System System Settings Management should retrieve all settings grouped by category" name="Role Management and Settings System System Settings Management should retrieve all settings grouped by category" time="0.019">
+    </testcase>
+    <testcase classname="Role Management and Settings System System Settings Management should handle notification settings" name="Role Management and Settings System System Settings Management should handle notification settings" time="0.023">
+    </testcase>
+    <testcase classname="Role Management and Settings System Role-Based Feature Access Control should validate quote to sale conversion permissions" name="Role Management and Settings System Role-Based Feature Access Control should validate quote to sale conversion permissions" time="0.019">
+    </testcase>
+    <testcase classname="Role Management and Settings System Role-Based Feature Access Control should validate vendor addition permissions" name="Role Management and Settings System Role-Based Feature Access Control should validate vendor addition permissions" time="0.018">
+    </testcase>
+    <testcase classname="Role Management and Settings System Role-Based Feature Access Control should validate database backup permissions" name="Role Management and Settings System Role-Based Feature Access Control should validate database backup permissions" time="0.021">
+    </testcase>
+    <testcase classname="Role Management and Settings System Role-Based Feature Access Control should validate report generation permissions" name="Role Management and Settings System Role-Based Feature Access Control should validate report generation permissions" time="0.018">
+    </testcase>
+    <testcase classname="Role Management and Settings System User Role Changes should handle user role promotion correctly" name="Role Management and Settings System User Role Changes should handle user role promotion correctly" time="0.023">
+    </testcase>
+    <testcase classname="Role Management and Settings System User Role Changes should handle user role demotion correctly" name="Role Management and Settings System User Role Changes should handle user role demotion correctly" time="0.024">
+    </testcase>
+  </testsuite>
+  <testsuite name="Authentication System" errors="0" failures="0" skipped="0" timestamp="2025-07-16T15:55:30" time="22.053" tests="13">
+    <testcase classname="Authentication System Development Mode Authentication should bypass authentication in development mode" name="Authentication System Development Mode Authentication should bypass authentication in development mode" time="0.008">
+    </testcase>
+    <testcase classname="Authentication System Development Mode Authentication should create mock admin user in development" name="Authentication System Development Mode Authentication should create mock admin user in development" time="0.002">
+    </testcase>
+    <testcase classname="Authentication System Production Mode Authentication should require authentication in production mode when user not authenticated" name="Authentication System Production Mode Authentication should require authentication in production mode when user not authenticated" time="0.001">
+    </testcase>
+    <testcase classname="Authentication System Production Mode Authentication should allow authenticated users in production mode" name="Authentication System Production Mode Authentication should allow authenticated users in production mode" time="0">
+    </testcase>
+    <testcase classname="Authentication System Production Mode Authentication should return 401 for AJAX requests when not authenticated" name="Authentication System Production Mode Authentication should return 401 for AJAX requests when not authenticated" time="0">
+    </testcase>
+    <testcase classname="Authentication System Production Mode Authentication should return 401 for JSON requests when not authenticated" name="Authentication System Production Mode Authentication should return 401 for JSON requests when not authenticated" time="0.001">
+    </testcase>
+    <testcase classname="Authentication System Password Validation should validate strong passwords" name="Authentication System Password Validation should validate strong passwords" time="0.001">
+    </testcase>
+    <testcase classname="Authentication System Password Validation should reject weak passwords" name="Authentication System Password Validation should reject weak passwords" time="0.001">
+    </testcase>
+    <testcase classname="Authentication System Password Validation should require minimum length" name="Authentication System Password Validation should require minimum length" time="0.001">
+    </testcase>
+    <testcase classname="Authentication System Password Validation should require uppercase letters" name="Authentication System Password Validation should require uppercase letters" time="0">
+    </testcase>
+    <testcase classname="Authentication System Password Validation should require special characters" name="Authentication System Password Validation should require special characters" time="0.001">
+    </testcase>
+    <testcase classname="Authentication System Password Hashing should hash passwords securely" name="Authentication System Password Hashing should hash passwords securely" time="0.589">
+    </testcase>
+    <testcase classname="Authentication System Password Hashing should generate secure temporary passwords" name="Authentication System Password Hashing should generate secure temporary passwords" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Charge Code Management API" errors="0" failures="7" skipped="0" timestamp="2025-07-16T15:55:30" time="23.204" tests="8">
+    <testcase classname="Charge Code Management API GET /api/chargecodes should return all charge codes" name="Charge Code Management API GET /api/chargecodes should return all charge codes" time="0.028">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes-new.test.ts:127:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should create a new charge code" name="Charge Code Management API POST /api/chargecodes should create a new charge code" time="0.094">
+      <failure>Error: expected 201 &quot;Created&quot;, got 500 &quot;Internal Server Error&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes-new.test.ts:143:10)
+    at Promise.finally.completed (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1559:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1499:10)
+    at _callCircusTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1009:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:949:3)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1920:21)
+    at jestAdapter (/home/user/LUStores/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:272:16)
+    at runTest (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:340:7)
+    at Object.worker (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:494:12)
+----
+    at Test._assertStatus (/home/user/LUStores/node_modules/supertest/lib/test.js:309:14)
+    at /home/user/LUStores/node_modules/supertest/lib/test.js:365:13
+    at Test._assertFunction (/home/user/LUStores/node_modules/supertest/lib/test.js:342:13)
+    at Test.assert (/home/user/LUStores/node_modules/supertest/lib/test.js:195:23)
+    at localAssert (/home/user/LUStores/node_modules/supertest/lib/test.js:138:14)
+    at Server.&lt;anonymous&gt; (/home/user/LUStores/node_modules/supertest/lib/test.js:152:11)
+    at Object.onceWrapper (node:events:621:28)
+    at Server.emit (node:events:507:28)
+    at emitCloseNT (node:net:2419:8)
+    at processTicksAndRejections (node:internal/process/task_queues:89:21)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should return 400 if code is missing" name="Charge Code Management API POST /api/chargecodes should return 400 if code is missing" time="0.024">
+    </testcase>
+    <testcase classname="Charge Code Management API Sales with Charge Code Validation should create sale with valid charge code" name="Charge Code Management API Sales with Charge Code Validation should create sale with valid charge code" time="0.019">
+      <failure>Error: expected 201 &quot;Created&quot;, got 400 &quot;Bad Request&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes-new.test.ts:191:10)
+    at Promise.finally.completed (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1559:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1499:10)
+    at _callCircusTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1009:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:949:3)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1920:21)
+    at jestAdapter (/home/user/LUStores/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:272:16)
+    at runTest (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:340:7)
+    at Object.worker (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:494:12)
+----
+    at Test._assertStatus (/home/user/LUStores/node_modules/supertest/lib/test.js:309:14)
+    at /home/user/LUStores/node_modules/supertest/lib/test.js:365:13
+    at Test._assertFunction (/home/user/LUStores/node_modules/supertest/lib/test.js:342:13)
+    at Test.assert (/home/user/LUStores/node_modules/supertest/lib/test.js:195:23)
+    at localAssert (/home/user/LUStores/node_modules/supertest/lib/test.js:138:14)
+    at Server.&lt;anonymous&gt; (/home/user/LUStores/node_modules/supertest/lib/test.js:152:11)
+    at Object.onceWrapper (node:events:621:28)
+    at Server.emit (node:events:507:28)
+    at emitCloseNT (node:net:2419:8)
+    at processTicksAndRejections (node:internal/process/task_queues:89:21)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Sales with Charge Code Validation should reject sale with expired charge code" name="Charge Code Management API Sales with Charge Code Validation should reject sale with expired charge code" time="0.023">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;EXPIRED_CHARGE_CODE&quot;
+Received: &quot;INVALID_CHARGE_CODE&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes-new.test.ts:216:34)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Sales with Charge Code Validation should reject sale with future charge code" name="Charge Code Management API Sales with Charge Code Validation should reject sale with future charge code" time="0.02">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;PREMATURE_CHARGE_CODE&quot;
+Received: &quot;INVALID_CHARGE_CODE&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes-new.test.ts:239:34)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Charge Code Exclusions Integration should reject sale when item category is excluded for charge code" name="Charge Code Management API Charge Code Exclusions Integration should reject sale when item category is excluded for charge code" time="0.022">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;CHARGE_CODE_EXCLUSION&quot;
+Received: &quot;INVALID_CHARGE_CODE&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes-new.test.ts:299:34)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Complex Scenario: Complete Workflow should handle complete charge code lifecycle with sales and exclusions" name="Charge Code Management API Complex Scenario: Complete Workflow should handle complete charge code lifecycle with sales and exclusions" time="0.015">
+      <failure>Error: Failed query: insert into &quot;categories&quot; (&quot;id&quot;, &quot;name&quot;, &quot;description&quot;, &quot;icon&quot;, &quot;color&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values (default, $1, $2, $3, $4, default, default) returning &quot;id&quot;, &quot;name&quot;, &quot;description&quot;, &quot;icon&quot;, &quot;color&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: Workflow Test Category,Category for complete workflow test,fas fa-workflow,purple
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createCategory (/home/user/LUStores/server/storage.ts:309:27)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes-new.test.ts:307:32)</failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="Charge Code Management API" errors="0" failures="17" skipped="0" timestamp="2025-07-16T15:55:30" time="23.881" tests="22">
+    <testcase classname="Charge Code Management API GET /api/chargecodes should return all charge codes" name="Charge Code Management API GET /api/chargecodes should return all charge codes" time="0.033">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:144:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API GET /api/chargecodes should return empty array when no charge codes exist" name="Charge Code Management API GET /api/chargecodes should return empty array when no charge codes exist" time="0.035">
+    </testcase>
+    <testcase classname="Charge Code Management API GET /api/chargecodes/:code should return a specific charge code" name="Charge Code Management API GET /api/chargecodes/:code should return a specific charge code" time="0.014">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:165:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API GET /api/chargecodes/:code should return 404 for non-existent charge code" name="Charge Code Management API GET /api/chargecodes/:code should return 404 for non-existent charge code" time="0.021">
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should create a new charge code" name="Charge Code Management API POST /api/chargecodes should create a new charge code" time="0.069">
+      <failure>Error: expected 201 &quot;Created&quot;, got 500 &quot;Internal Server Error&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:190:10)
+    at Promise.finally.completed (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1559:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1499:10)
+    at _callCircusTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1009:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:949:3)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1920:21)
+    at jestAdapter (/home/user/LUStores/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:272:16)
+    at runTest (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:340:7)
+    at Object.worker (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:494:12)
+----
+    at Test._assertStatus (/home/user/LUStores/node_modules/supertest/lib/test.js:309:14)
+    at /home/user/LUStores/node_modules/supertest/lib/test.js:365:13
+    at Test._assertFunction (/home/user/LUStores/node_modules/supertest/lib/test.js:342:13)
+    at Test.assert (/home/user/LUStores/node_modules/supertest/lib/test.js:195:23)
+    at localAssert (/home/user/LUStores/node_modules/supertest/lib/test.js:138:14)
+    at Server.&lt;anonymous&gt; (/home/user/LUStores/node_modules/supertest/lib/test.js:152:11)
+    at Object.onceWrapper (node:events:621:28)
+    at Server.emit (node:events:507:28)
+    at emitCloseNT (node:net:2419:8)
+    at processTicksAndRejections (node:internal/process/task_queues:89:21)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should return 400 if code is missing" name="Charge Code Management API POST /api/chargecodes should return 400 if code is missing" time="0.024">
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should return 400 if title is missing" name="Charge Code Management API POST /api/chargecodes should return 400 if title is missing" time="0.016">
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should return 409 for duplicate charge code" name="Charge Code Management API POST /api/chargecodes should return 409 for duplicate charge code" time="0.007">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:222:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should trim whitespace from code and title" name="Charge Code Management API POST /api/chargecodes should trim whitespace from code and title" time="0.036">
+      <failure>Error: expected 201 &quot;Created&quot;, got 500 &quot;Internal Server Error&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:243:10)
+    at Promise.finally.completed (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1559:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1499:10)
+    at _callCircusTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1009:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:949:3)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1920:21)
+    at jestAdapter (/home/user/LUStores/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:272:16)
+    at runTest (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:340:7)
+    at Object.worker (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:494:12)
+----
+    at Test._assertStatus (/home/user/LUStores/node_modules/supertest/lib/test.js:309:14)
+    at /home/user/LUStores/node_modules/supertest/lib/test.js:365:13
+    at Test._assertFunction (/home/user/LUStores/node_modules/supertest/lib/test.js:342:13)
+    at Test.assert (/home/user/LUStores/node_modules/supertest/lib/test.js:195:23)
+    at localAssert (/home/user/LUStores/node_modules/supertest/lib/test.js:138:14)
+    at Server.&lt;anonymous&gt; (/home/user/LUStores/node_modules/supertest/lib/test.js:152:11)
+    at Object.onceWrapper (node:events:621:28)
+    at Server.emit (node:events:507:28)
+    at emitCloseNT (node:net:2419:8)
+    at processTicksAndRejections (node:internal/process/task_queues:89:21)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API POST /api/chargecodes should handle optional fields correctly" name="Charge Code Management API POST /api/chargecodes should handle optional fields correctly" time="0.033">
+      <failure>Error: expected 201 &quot;Created&quot;, got 500 &quot;Internal Server Error&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:258:10)
+    at Promise.finally.completed (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1559:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1499:10)
+    at _callCircusTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1009:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:949:3)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1920:21)
+    at jestAdapter (/home/user/LUStores/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:272:16)
+    at runTest (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:340:7)
+    at Object.worker (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:494:12)
+----
+    at Test._assertStatus (/home/user/LUStores/node_modules/supertest/lib/test.js:309:14)
+    at /home/user/LUStores/node_modules/supertest/lib/test.js:365:13
+    at Test._assertFunction (/home/user/LUStores/node_modules/supertest/lib/test.js:342:13)
+    at Test.assert (/home/user/LUStores/node_modules/supertest/lib/test.js:195:23)
+    at localAssert (/home/user/LUStores/node_modules/supertest/lib/test.js:138:14)
+    at Server.&lt;anonymous&gt; (/home/user/LUStores/node_modules/supertest/lib/test.js:152:11)
+    at Object.onceWrapper (node:events:621:28)
+    at Server.emit (node:events:507:28)
+    at emitCloseNT (node:net:2419:8)
+    at processTicksAndRejections (node:internal/process/task_queues:89:21)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API PUT /api/chargecodes/:code should update an existing charge code" name="Charge Code Management API PUT /api/chargecodes/:code should update an existing charge code" time="0.016">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:268:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API PUT /api/chargecodes/:code should return 404 for non-existent charge code" name="Charge Code Management API PUT /api/chargecodes/:code should return 404 for non-existent charge code" time="0.022">
+    </testcase>
+    <testcase classname="Charge Code Management API PUT /api/chargecodes/:code should return 400 if title is missing" name="Charge Code Management API PUT /api/chargecodes/:code should return 400 if title is missing" time="0.009">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:297:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API DELETE /api/chargecodes/:code should delete an unused charge code" name="Charge Code Management API DELETE /api/chargecodes/:code should delete an unused charge code" time="0.016">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:310:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API DELETE /api/chargecodes/:code should return 400 when trying to delete a charge code in use" name="Charge Code Management API DELETE /api/chargecodes/:code should return 400 when trying to delete a charge code in use" time="0.024">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: TEST-CC-001,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-12-31T00:00:00.000Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:325:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API GET /api/chargecodes/expiring/soon should return charge codes expiring within 30 days" name="Charge Code Management API GET /api/chargecodes/expiring/soon should return charge codes expiring within 30 days" time="0.03">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: EXPIRING-SOON,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-07-31T15:55:53.654Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:370:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API GET /api/chargecodes/expiring/soon should not return charge codes expiring beyond 30 days" name="Charge Code Management API GET /api/chargecodes/expiring/soon should not return charge codes expiring beyond 30 days" time="0.017">
+      <failure>Error: Failed query: insert into &quot;chargecodes&quot; (&quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values ($1, $2, $3, $4, $5, $6, $7, default, default) returning &quot;code&quot;, &quot;title&quot;, &quot;authorised_by&quot;, &quot;valid_from&quot;, &quot;valid_until&quot;, &quot;pin&quot;, &quot;cost_centre&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: EXPIRING-FAR,Test Charge Code,test_admin_001,2025-01-01T00:00:00.000Z,2025-09-14T15:55:53.675Z,1234,TEST-DEPT
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createChargeCode (/home/user/LUStores/server/storage.ts:1628:26)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:388:7)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Sales with Charge Code Validation should create sale with valid charge code" name="Charge Code Management API Sales with Charge Code Validation should create sale with valid charge code" time="0.021">
+      <failure>Error: expected 201 &quot;Created&quot;, got 400 &quot;Bad Request&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:428:10)
+    at Promise.finally.completed (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1559:28)
+    at new Promise (&lt;anonymous&gt;)
+    at callAsyncCircusFn (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1499:10)
+    at _callCircusTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1009:40)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at _runTest (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:949:3)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:839:13)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at _runTestsForDescribeBlock (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:829:11)
+    at run (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:757:3)
+    at runAndTransformResultsToJestFormat (/home/user/LUStores/node_modules/jest-circus/build/jestAdapterInit.js:1920:21)
+    at jestAdapter (/home/user/LUStores/node_modules/jest-circus/build/runner.js:101:19)
+    at runTestInternal (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:272:16)
+    at runTest (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:340:7)
+    at Object.worker (/home/user/LUStores/node_modules/jest-runner/build/testWorker.js:494:12)
+----
+    at Test._assertStatus (/home/user/LUStores/node_modules/supertest/lib/test.js:309:14)
+    at /home/user/LUStores/node_modules/supertest/lib/test.js:365:13
+    at Test._assertFunction (/home/user/LUStores/node_modules/supertest/lib/test.js:342:13)
+    at Test.assert (/home/user/LUStores/node_modules/supertest/lib/test.js:195:23)
+    at localAssert (/home/user/LUStores/node_modules/supertest/lib/test.js:138:14)
+    at Server.&lt;anonymous&gt; (/home/user/LUStores/node_modules/supertest/lib/test.js:152:11)
+    at Object.onceWrapper (node:events:621:28)
+    at Server.emit (node:events:507:28)
+    at emitCloseNT (node:net:2419:8)
+    at processTicksAndRejections (node:internal/process/task_queues:89:21)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Sales with Charge Code Validation should reject sale with expired charge code" name="Charge Code Management API Sales with Charge Code Validation should reject sale with expired charge code" time="0.023">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;EXPIRED_CHARGE_CODE&quot;
+Received: &quot;INVALID_CHARGE_CODE&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:453:34)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Sales with Charge Code Validation should reject sale with future charge code" name="Charge Code Management API Sales with Charge Code Validation should reject sale with future charge code" time="0.021">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;PREMATURE_CHARGE_CODE&quot;
+Received: &quot;INVALID_CHARGE_CODE&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:476:34)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Charge Code Exclusions Integration should reject sale when item category is excluded for charge code" name="Charge Code Management API Charge Code Exclusions Integration should reject sale when item category is excluded for charge code" time="0.023">
+      <failure>Error: expect(received).toBe(expected) // Object.is equality
+
+Expected: &quot;CHARGE_CODE_EXCLUSION&quot;
+Received: &quot;INVALID_CHARGE_CODE&quot;
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:535:34)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)</failure>
+    </testcase>
+    <testcase classname="Charge Code Management API Complex Scenario: Complete Workflow should handle complete charge code lifecycle with sales and exclusions" name="Charge Code Management API Complex Scenario: Complete Workflow should handle complete charge code lifecycle with sales and exclusions" time="0.013">
+      <failure>Error: Failed query: insert into &quot;categories&quot; (&quot;id&quot;, &quot;name&quot;, &quot;description&quot;, &quot;icon&quot;, &quot;color&quot;, &quot;created_at&quot;, &quot;updated_at&quot;) values (default, $1, $2, $3, $4, default, default) returning &quot;id&quot;, &quot;name&quot;, &quot;description&quot;, &quot;icon&quot;, &quot;color&quot;, &quot;created_at&quot;, &quot;updated_at&quot;
+params: Workflow Test Category,Category for complete workflow test,fas fa-workflow,purple
+    at NodePgPreparedQuery.queryWithCache (/home/user/LUStores/node_modules/src/pg-core/session.ts:74:11)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at /home/user/LUStores/node_modules/src/node-postgres/session.ts:154:19
+    at DatabaseStorage.createCategory (/home/user/LUStores/server/storage.ts:309:27)
+    at Object.&lt;anonymous&gt; (/home/user/LUStores/server/__tests__/charge-codes.test.ts:543:32)</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

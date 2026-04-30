@@ -1,0 +1,79 @@
+{
+  "orderId": "ORD-2025-001",
+  "supplier": {
+    "id": "SUPP-001", 
+    "name": "Office Supplies Ltd",
+    "contact": "John Smith",
+    "email": "orders@officesupplies.co.uk",
+    "phone": "+44 1234 567890"
+  },
+  "subtotal": 450.00,
+  "vatRate": 0.20,
+  "vatAmount": 90.00,
+  "total": 540.00,
+  "status": "pending",
+  "receivedDate": null,
+  "notes": "Quarterly office supplies order - urgent delivery required",
+  "items": [
+    {
+      "itemId": 1001,
+      "itemSku": "CHAIR-ERG-001",
+      "itemName": "Ergonomic Office Chair",
+      "description": "High-back ergonomic chair with lumbar support and adjustable height",
+      "categoryId": 1,
+      "quantity": 5,
+      "unitCost": 89.99,
+      "vatRate": 0.20,
+      "vatAmount": 90.00,
+      "totalCost": 449.95
+    },
+    {
+      "itemId": 1002,
+      "itemSku": "DESK-LAMP-LED-002",
+      "itemName": "LED Desk Lamp",
+      "description": "Adjustable LED desk lamp with USB charging port and touch controls",
+      "categoryId": 2,
+      "quantity": 8,
+      "unitCost": 32.50,
+      "vatRate": 0.20,
+      "vatAmount": 52.00,
+      "totalCost": 260.00
+    },
+    {
+      "itemId": 1003,
+      "itemSku": "MOUSE-WIRELESS-003",
+      "itemName": "Wireless Optical Mouse",
+      "description": "Ergonomic wireless mouse with optical tracking and long battery life",
+      "categoryId": 2,
+      "quantity": 15,
+      "unitCost": 18.99,
+      "vatRate": 0.20,
+      "vatAmount": 56.97,
+      "totalCost": 284.85
+    },
+    {
+      "itemId": 1004,
+      "itemSku": "NOTEBOOK-A4-004",
+      "itemName": "A4 Lined Notebook",
+      "description": "200-page A4 notebook with lined pages and hardcover binding",
+      "categoryId": 3,
+      "quantity": 25,
+      "unitCost": 4.99,
+      "vatRate": 0.20,
+      "vatAmount": 24.95,
+      "totalCost": 124.75
+    },
+    {
+      "itemId": 1005,
+      "itemSku": "PEN-BALLPOINT-005",
+      "itemName": "Blue Ballpoint Pens (Pack of 10)",
+      "description": "High-quality ballpoint pens with smooth writing and comfortable grip",
+      "categoryId": 3,
+      "quantity": 12,
+      "unitCost": 8.99,
+      "vatRate": 0.20,
+      "vatAmount": 21.58,
+      "totalCost": 107.88
+    }
+  ]
+}

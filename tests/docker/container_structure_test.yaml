@@ -1,0 +1,41 @@
+schemaVersion: 2.0.0
+
+metadataTest:
+  envVars:
+    - key: "NODE_ENV"
+      value: "production"
+  exposedPorts: ["5000"]
+  user: "appuser"
+
+fileExistenceTests:
+  - name: 'Built application'
+    path: '/app/dist'
+    shouldExist: true
+  - name: 'package.json'
+    path: '/app/package.json'
+    shouldExist: true
+  - name: 'node_modules'
+    path: '/app/node_modules'
+    shouldExist: true
+  - name: 'Documentation'
+    path: '/app/docs/_build/html'
+    shouldExist: true
+
+fileContentTests:
+  - name: 'package.json contains correct name'
+    path: '/app/package.json'
+    expectedContents: ['rest-express']
+
+commandTests:  
+  - name: "Node.js version"
+    command: "node"
+    args: ["--version"]
+    expectedOutput: ["v24\\.[0-9]+\\.[0-9]+"] # Specifically test for Node 24
+  - name: "Health check endpoint"
+    command: "wget"
+    args: ["--help"]
+    expectedOutput: ["GNU Wget"] # Verify wget is available for health checks
+  - name: "Application user"
+    command: "whoami"
+    args: []
+    expectedOutput: ["appuser"] # Verify running as non-root user

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MariaDB to PostgreSQL Migration Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .migration-container { padding: 1rem; }
+        .connection-section { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        .mapping-table { font-size: 0.9rem; }
+        .mapping-table th { background-color: #e9ecef; position: sticky; top: 0; z-index: 10; }
+        .old-column { background-color: #fff3cd; }
+        .new-column { background-color: #d1ecf1; }
+        .warning-badge { font-size: 0.75rem; }
+        .preview-section { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+        .status-connected { color: #28a745; }
+        .status-disconnected { color: #dc3545; }
+        .data-preview { max-height: 300px; overflow-y: auto; }
+        .transformation-controls { background: #e9ecef; padding: 1rem; margin: 1rem 0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid migration-container">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1><i class="fas fa-database me-2"></i>MariaDB to PostgreSQL Migration Tool</h1>
+                <p class="text-muted">Configure column mappings, transformations, and migrate data from MariaDB to PostgreSQL</p>
+            </div>
+        </div>
+
+        <!-- Connection Section -->
+        <div class="connection-section">
+            <h3><i class="fas fa-plug me-2"></i>Database Connections</h3>
+            <div class="row">
+                <!-- MariaDB Connection -->
+                <div class="col-md-6">
+                    <h5><i class="fas fa-database me-1"></i>MariaDB (Source)</h5>
+                    <div class="mb-2">
+                        <input type="text" class="form-control form-control-sm" id="mariadb-host" placeholder="Host" value="localhost">
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="mariadb-port" placeholder="Port" value="3306">
+                        </div>
+                        <div class="col-8">
+                            <input type="text" class="form-control form-control-sm" id="mariadb-database" placeholder="Database">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <input type="text" class="form-control form-control-sm" id="mariadb-user" placeholder="Username">
+                        </div>
+                        <div class="col-6">
+                            <input type="password" class="form-control form-control-sm" id="mariadb-password" placeholder="Password">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PostgreSQL Connection -->
+                <div class="col-md-6">
+                    <h5><i class="fas fa-elephant me-1"></i>PostgreSQL (Target)</h5>
+                    <div class="mb-2">
+                        <input type="text" class="form-control form-control-sm" id="postgresql-host" placeholder="Host" value="localhost">
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="postgresql-port" placeholder="Port" value="5432">
+                        </div>
+                        <div class="col-8">
+                            <input type="text" class="form-control form-control-sm" id="postgresql-database" placeholder="Database">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <input type="text" class="form-control form-control-sm" id="postgresql-user" placeholder="Username">
+                        </div>
+                        <div class="col-6">
+                            <input type="password" class="form-control form-control-sm" id="postgresql-password" placeholder="Password">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3 text-center">
+                <button class="btn btn-primary btn-lg me-3" onclick="connectDatabases()">
+                    <i class="fas fa-link me-1"></i>Connect to Databases
+                </button>
+                <span id="connection-status" class="status-disconnected">
+                    <i class="fas fa-times-circle me-1"></i>Not Connected
+                </span>
+            </div>
+        </div>
+
+        <!-- Main Content (hidden until connected) -->
+        <div id="main-content" style="display: none;">
+            
+            <!-- Action Buttons -->
+            <div class="row mb-3">
+                <div class="col">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group me-2">
+                            <button class="btn btn-warning" onclick="clearPostgreSQL()">
+                                <i class="fas fa-trash me-1"></i>Clear PostgreSQL
+                            </button>
+                        </div>
+                        <div class="btn-group me-2">
+                            <button class="btn btn-success btn-lg" onclick="finalizeMigration()">
+                                <i class="fas fa-play me-1"></i>Finalize Migration
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-info" onclick="showStatus()">
+                                <i class="fas fa-info-circle me-1"></i>Status
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Tabs -->
+            <ul class="nav nav-tabs" id="table-tabs" role="tablist">
+                <!-- Tabs will be populated dynamically -->
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="table-tab-content">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Status Modal -->
+        <div class="modal fade" id="statusModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i>Migration Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="status-content">
+                        <!-- Status content will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Modal -->
+        <div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-sync-alt fa-spin me-2"></i>Migration in Progress</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="progress mb-3">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <p id="progress-message">Initializing migration...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let mariadbTables = [];
+        let postgresqlTables = [];
+        let currentMappings = {};
+        let currentTransformations = {};
+
+        // Connect to databases
+        async function connectDatabases() {
+            const mariadbConfig = {
+                host: document.getElementById('mariadb-host').value,
+                port: document.getElementById('mariadb-port').value,
+                user: document.getElementById('mariadb-user').value,
+                password: document.getElementById('mariadb-password').value,
+                database: document.getElementById('mariadb-database').value
+            };
+
+            const postgresqlConfig = {
+                host: document.getElementById('postgresql-host').value,
+                port: document.getElementById('postgresql-port').value,
+                user: document.getElementById('postgresql-user').value,
+                password: document.getElementById('postgresql-password').value,
+                database: document.getElementById('postgresql-database').value
+            };
+
+            try {
+                const response = await fetch('/api/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mariadb: mariadbConfig, postgresql: postgresqlConfig })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    mariadbTables = result.mariadb_tables;
+                    postgresqlTables = result.postgresql_tables;
+                    
+                    document.getElementById('connection-status').innerHTML = 
+                        '<i class="fas fa-check-circle me-1"></i>Connected';
+                    document.getElementById('connection-status').className = 'status-connected';
+                    document.getElementById('main-content').style.display = 'block';
+
+                    await loadTableTabs();
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                alert('Connection failed: ' + error.message);
+                document.getElementById('connection-status').innerHTML = 
+                    '<i class="fas fa-times-circle me-1"></i>Connection Failed';
+            }
+        }
+
+        // Load table tabs
+        async function loadTableTabs() {
+            const tabsContainer = document.getElementById('table-tabs');
+            const contentContainer = document.getElementById('table-tab-content');
+
+            tabsContainer.innerHTML = '';
+            contentContainer.innerHTML = '';
+
+            for (let i = 0; i < mariadbTables.length; i++) {
+                const table = mariadbTables[i];
+                const isActive = i === 0 ? 'active' : '';
+
+                // Create tab
+                const tab = document.createElement('li');
+                tab.className = 'nav-item';
+                tab.innerHTML = `
+                    <button class="nav-link ${isActive}" 
+                            id="${table}-tab" 
+                            data-bs-toggle="tab" 
+                            data-bs-target="#${table}-pane" 
+                            type="button" 
+                            role="tab">
+                        <i class="fas fa-table me-1"></i>${table}
+                    </button>
+                `;
+                tabsContainer.appendChild(tab);
+
+                // Create tab content
+                const content = document.createElement('div');
+                content.className = `tab-pane fade ${isActive ? 'show active' : ''}`;
+                content.id = `${table}-pane`;
+                content.role = 'tabpanel';
+                content.innerHTML = await generateTableContent(table);
+                contentContainer.appendChild(content);
+
+                // Load table schema
+                if (i === 0) {
+                    await loadTableSchema(table);
+                }
+            }
+
+            // Add event listeners for tab changes
+            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', async function(event) {
+                    const tableName = event.target.id.replace('-tab', '');
+                    await loadTableSchema(tableName);
+                });
+            });
+        }
+
+        // Generate table content HTML
+        async function generateTableContent(tableName) {
+            return `
+                <div class="mt-3">
+                    <!-- Table Controls -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <h4><i class="fas fa-table me-2"></i>Mapping for ${tableName}</h4>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-outline-info me-2" onclick="previewData('${tableName}')">
+                                <i class="fas fa-eye me-1"></i>Preview
+                            </button>
+                            <button class="btn btn-outline-success" onclick="saveMapping('${tableName}')">
+                                <i class="fas fa-save me-1"></i>Save Mapping
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Transformation Controls -->
+                    <div class="transformation-controls">
+                        <h5><i class="fas fa-cogs me-2"></i>Column Transformations</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Concatenation:</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" id="${tableName}-concat-cols" 
+                                           placeholder="column1,column2">
+                                    <input type="text" class="form-control" id="${tableName}-concat-sep" 
+                                           placeholder="Separator" value=" ">
+                                    <button class="btn btn-outline-primary" onclick="addConcatenation('${tableName}')">Add</button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Custom Value:</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" id="${tableName}-custom-column" 
+                                           placeholder="Target column">
+                                    <input type="text" class="form-control" id="${tableName}-custom-value" 
+                                           placeholder="Custom value">
+                                    <button class="btn btn-outline-primary" onclick="addCustomValue('${tableName}')">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column Mapping Table -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered mapping-table" id="${tableName}-mapping-table">
+                            <thead>
+                                <tr>
+                                    <th class="old-column">MariaDB Column</th>
+                                    <th>Data Type</th>
+                                    <th>Sample Data</th>
+                                    <th class="new-column">PostgreSQL Column</th>
+                                    <th>Target Type</th>
+                                    <th>Warnings</th>
+                                    <th>Manual Override</th>
+                                </tr>
+                            </thead>
+                            <tbody id="${tableName}-mapping-body">
+                                <!-- Content will be loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Data Preview -->
+                    <div class="preview-section" id="${tableName}-preview" style="display: none;">
+                        <h5><i class="fas fa-eye me-2"></i>Data Preview</h5>
+                        <div class="data-preview" id="${tableName}-preview-content">
+                            <!-- Preview content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load table schema and populate mapping interface
+        async function loadTableSchema(tableName) {
+            try {
+                // Get MariaDB schema
+                const mariadbResponse = await fetch(`/api/schema/mariadb/${tableName}`);
+                const mariadbSchema = await mariadbResponse.json();
+
+                if (mariadbSchema.error) {
+                    console.error('Error loading MariaDB schema:', mariadbSchema.error);
+                    return;
+                }
+
+                // Populate mapping table
+                const tbody = document.getElementById(`${tableName}-mapping-body`);
+                if (!tbody) return;
+
+                let html = '';
+                const columns = Object.keys(mariadbSchema.columns);
+                const sampleData = mariadbSchema.sample_data[0] || {};
+
+                for (const column of columns) {
+                    const colInfo = mariadbSchema.columns[column];
+                    const sample = sampleData[column] || '';
+
+                    html += `
+                        <tr data-column="${column}">
+                            <td class="old-column">
+                                <strong>${column}</strong>
+                                ${colInfo.key === 'PRI' ? '<span class="badge bg-danger ms-1">PK</span>' : ''}
+                                ${colInfo.key === 'MUL' ? '<span class="badge bg-warning ms-1">FK</span>' : ''}
+                            </td>
+                            <td><code>${colInfo.type}</code></td>
+                            <td><small class="text-muted" title="${sample}">${truncateText(sample, 20)}</small></td>
+                            <td class="new-column">
+                                <select class="form-select form-select-sm target-column" 
+                                        data-table="${tableName}" data-column="${column}"
+                                        onchange="updateMapping('${tableName}', '${column}', this.value)">
+                                    <option value="">Select column...</option>
+                                    ${generatePostgreSQLOptions()}
+                                </select>
+                            </td>
+                            <td class="target-type" data-column="${column}">-</td>
+                            <td class="warnings" data-column="${column}"></td>
+                            <td>
+                                <input type="text" class="form-control form-control-sm manual-value" 
+                                       data-table="${tableName}" data-column="${column}"
+                                       placeholder="Manual override"
+                                       onchange="setManualData('${tableName}', '0', '${column}', this.value)">
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                tbody.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading table schema:', error);
+            }
+        }
+
+        // Generate PostgreSQL column options
+        function generatePostgreSQLOptions() {
+            let options = '';
+            for (const table of postgresqlTables) {
+                options += `<optgroup label="${table}">`;
+                // We'd need to load the schema for each table to get columns
+                // For now, just show the table name
+                options += `<option value="${table}.*">${table} (all columns)</option>`;
+                options += '</optgroup>';
+            }
+            return options;
+        }
+
+        // Update column mapping
+        async function updateMapping(tableName, oldColumn, newColumn) {
+            if (!currentMappings[tableName]) {
+                currentMappings[tableName] = {};
+            }
+            
+            currentMappings[tableName][oldColumn] = newColumn;
+
+            try {
+                const response = await fetch('/api/mapping', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        table: tableName,
+                        mappings: currentMappings[tableName]
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success && result.warnings) {
+                    // Display warnings
+                    const warningCell = document.querySelector(`tr[data-column="${oldColumn}"] .warnings`);
+                    if (warningCell && result.warnings.length > 0) {
+                        warningCell.innerHTML = result.warnings.map(w => 
+                            `<span class="badge bg-warning warning-badge" title="${w.sample_value}">Type cast: ${w.old_type} → ${w.new_type}</span>`
+                        ).join(' ');
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating mapping:', error);
+            }
+        }
+
+        // Add concatenation transformation
+        async function addConcatenation(tableName) {
+            const columns = document.getElementById(`${tableName}-concat-cols`).value.split(',').map(s => s.trim());
+            const separator = document.getElementById(`${tableName}-concat-sep`).value;
+
+            if (columns.length < 2) {
+                alert('Please specify at least 2 columns to concatenate');
+                return;
+            }
+
+            const targetColumn = prompt('Enter target column name:');
+            if (!targetColumn) return;
+
+            try {
+                await fetch('/api/transformation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        table: tableName,
+                        column: targetColumn,
+                        type: 'concatenate',
+                        params: { columns, separator }
+                    })
+                });
+
+                alert('Concatenation transformation added successfully');
+            } catch (error) {
+                console.error('Error adding concatenation:', error);
+            }
+        }
+
+        // Add custom value transformation
+        async function addCustomValue(tableName) {
+            const targetColumn = document.getElementById(`${tableName}-custom-column`).value;
+            const customValue = document.getElementById(`${tableName}-custom-value`).value;
+
+            if (!targetColumn || !customValue) {
+                alert('Please specify both target column and custom value');
+                return;
+            }
+
+            try {
+                await fetch('/api/transformation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        table: tableName,
+                        column: targetColumn,
+                        type: 'custom',
+                        params: { value: customValue }
+                    })
+                });
+
+                alert('Custom value transformation added successfully');
+                document.getElementById(`${tableName}-custom-column`).value = '';
+                document.getElementById(`${tableName}-custom-value`).value = '';
+            } catch (error) {
+                console.error('Error adding custom value:', error);
+            }
+        }
+
+        // Set manual data override
+        async function setManualData(tableName, rowId, column, value) {
+            try {
+                await fetch('/api/manual-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        table: tableName,
+                        row_id: rowId,
+                        column: column,
+                        value: value
+                    })
+                });
+            } catch (error) {
+                console.error('Error setting manual data:', error);
+            }
+        }
+
+        // Preview transformed data
+        async function previewData(tableName) {
+            try {
+                const response = await fetch(`/api/preview/${tableName}`);
+                const result = await response.json();
+
+                const previewSection = document.getElementById(`${tableName}-preview`);
+                const previewContent = document.getElementById(`${tableName}-preview-content`);
+
+                if (result.error) {
+                    previewContent.innerHTML = `<div class="alert alert-danger">Error: ${result.error}</div>`;
+                } else {
+                    let html = '<div class="table-responsive"><table class="table table-sm table-striped"><thead><tr>';
+                    
+                    // Headers
+                    const columns = result.mapped_columns.length > 0 ? result.mapped_columns : result.original_columns;
+                    columns.forEach(col => {
+                        html += `<th>${col}</th>`;
+                    });
+                    html += '</tr></thead><tbody>';
+
+                    // Rows
+                    result.rows.slice(0, 5).forEach(row => {
+                        html += '<tr>';
+                        columns.forEach(col => {
+                            html += `<td>${truncateText(row[col] || '', 30)}</td>`;
+                        });
+                        html += '</tr>';
+                    });
+
+                    html += '</tbody></table></div>';
+                    previewContent.innerHTML = html;
+                }
+
+                previewSection.style.display = 'block';
+            } catch (error) {
+                console.error('Error previewing data:', error);
+            }
+        }
+
+        // Save mapping configuration
+        async function saveMapping(tableName) {
+            // This could save the current mapping to the server
+            alert(`Mapping configuration for ${tableName} saved successfully!`);
+        }
+
+        // Clear PostgreSQL database
+        async function clearPostgreSQL() {
+            if (!confirm('Are you sure you want to clear ALL data from the PostgreSQL database? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/clear-postgresql', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('PostgreSQL database cleared successfully!');
+                } else {
+                    alert('Error clearing database: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error clearing database:', error);
+                alert('Error clearing database: ' + error.message);
+            }
+        }
+
+        // Finalize migration
+        async function finalizeMigration() {
+            if (!confirm('Are you sure you want to start the migration? This will migrate all configured data to PostgreSQL.')) {
+                return;
+            }
+
+            // Show progress modal
+            const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+            progressModal.show();
+
+            try {
+                const response = await fetch('/api/finalize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+                
+                progressModal.hide();
+
+                if (result.success) {
+                    alert(`Migration completed successfully!\\n\\n` +
+                          `Tables migrated: ${result.stats.tables_migrated}\\n` +
+                          `Records migrated: ${result.stats.records_migrated}\\n` +
+                          `Duration: ${new Date(result.stats.end_time) - new Date(result.stats.start_time)}ms`);
+                } else {
+                    alert('Migration failed: ' + result.error);
+                }
+            } catch (error) {
+                progressModal.hide();
+                console.error('Error during migration:', error);
+                alert('Migration failed: ' + error.message);
+            }
+        }
+
+        // Show status information
+        async function showStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const status = await response.json();
+
+                const statusContent = document.getElementById('status-content');
+                statusContent.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-database me-2"></i>MariaDB Tables</h6>
+                            <ul class="list-group list-group-flush">
+                                ${status.mariadb_tables.map(table => `<li class="list-group-item">${table}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-elephant me-2"></i>PostgreSQL Tables</h6>
+                            <ul class="list-group list-group-flush">
+                                ${status.postgresql_tables.map(table => `<li class="list-group-item">${table}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6><i class="fas fa-cogs me-2"></i>Configuration</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Column Mappings:</strong> ${Object.keys(status.column_mappings).length} tables configured</li>
+                            <li><strong>Transformations:</strong> ${Object.keys(status.transformations).length} transformations</li>
+                            <li><strong>Manual Data Overrides:</strong> ${status.manual_data_count}</li>
+                            <li><strong>Warnings:</strong> ${status.warnings_count}</li>
+                        </ul>
+                    </div>
+                `;
+
+                const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+                statusModal.show();
+            } catch (error) {
+                console.error('Error loading status:', error);
+            }
+        }
+
+        // Utility function
+        function truncateText(text, maxLength) {
+            if (!text) return '';
+            const str = String(text);
+            return str.length > maxLength ? str.substring(0, maxLength) + '...' : str;
+        }
+    </script>
+</body>
+</html>

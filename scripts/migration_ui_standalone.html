@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy Data Migration Interface - Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .migration-container { padding: 1rem; }
+        .mapping-table { font-size: 0.9rem; }
+        .mapping-table th { background-color: #f8f9fa; position: sticky; top: 0; z-index: 10; }
+        .old-column { background-color: #fff3cd; font-weight: bold; }
+        .data-entry { background-color: #f8f9fa; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .new-column { background-color: #d1ecf1; }
+        .dropdown-column { min-width: 180px; }
+        .multi-table-section { border: 2px dashed #6c757d; padding: 1rem; margin: 1rem 0; border-radius: 8px; }
+        .fk-indicator { color: #6f42c1; font-weight: bold; }
+        .pk-indicator { color: #dc3545; font-weight: bold; }
+        .demo-banner { background: linear-gradient(45deg, #007bff, #28a745); color: white; padding: 0.5rem; text-align: center; }
+    </style>
+</head>
+<body>
+    <!-- Demo Banner -->
+    <div class="demo-banner">
+        <i class="fas fa-eye me-2"></i><strong>DEMO MODE</strong> - Interactive Migration UI Preview
+    </div>
+
+    <div class="container-fluid migration-container">
+        <!-- Header -->
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <h2><i class="fas fa-exchange-alt me-2"></i>Legacy Data Migration Interface</h2>
+                <p class="text-muted">Map legacy database columns to new schema and edit data before migration</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button class="btn btn-outline-info me-2" onclick="showAlert('Validation', 'All mappings are valid! ✅')">
+                    <i class="fas fa-check-circle me-1"></i>Validate Mappings
+                </button>
+                <button class="btn btn-success" onclick="showAlert('Migration', 'Migration would process 2 tables with 7,640 records 🚀')">
+                    <i class="fas fa-play me-1"></i>Execute Migration
+                </button>
+            </div>
+        </div>
+
+        <!-- Table Tabs -->
+        <ul class="nav nav-tabs" id="table-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="stock-tab" data-bs-toggle="tab" data-bs-target="#stock-pane" type="button" role="tab">
+                    <i class="fas fa-table me-1"></i>stock
+                    <span class="badge bg-secondary ms-1">7,632</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-pane" type="button" role="tab">
+                    <i class="fas fa-table me-1"></i>users
+                    <span class="badge bg-secondary ms-1">8</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="supplier-tab" data-bs-toggle="tab" data-bs-target="#supplier-pane" type="button" role="tab">
+                    <i class="fas fa-table me-1"></i>supplier
+                    <span class="badge bg-secondary ms-1">235</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="issues-tab" data-bs-toggle="tab" data-bs-target="#issues-pane" type="button" role="tab">
+                    <i class="fas fa-table me-1"></i>issues
+                    <span class="badge bg-secondary ms-1">69,766</span>
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="table-tab-content">
+            <!-- Stock Table Tab -->
+            <div class="tab-pane fade show active" id="stock-pane" role="tabpanel">
+                
+                <!-- Table Controls -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary btn-sm" onclick="toggleMultiTable()">
+                                <i class="fas fa-plus me-1"></i>Add Multi-Table Mapping
+                            </button>
+                            <button class="btn btn-outline-info btn-sm" onclick="showPreview()">
+                                <i class="fas fa-eye me-1"></i>Preview Transformation
+                            </button>
+                            <button class="btn btn-outline-success btn-sm" onclick="showAlert('Save', 'Mappings saved successfully! 💾')">
+                                <i class="fas fa-save me-1"></i>Save Mappings
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <span class="text-muted">Records: <span>7,632</span></span>
+                    </div>
+                </div>
+
+                <!-- Multi-Table Mapping Section -->
+                <div class="multi-table-section" id="multi-table-section" style="display: none;">
+                    <h6><i class="fas fa-link me-2"></i>Multi-Table Mapping</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Add columns from table:</label>
+                            <select class="form-select form-select-sm">
+                                <option value="">Select table...</option>
+                                <option value="categories">categories</option>
+                                <option value="suppliers">suppliers</option>
+                                <option value="sources">sources</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary btn-sm d-block" onclick="showAlert('Multi-Table', 'Added columns from categories table 📋')">
+                                <i class="fas fa-plus me-1"></i>Add Columns
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-2">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Multi-table mapping enabled:</strong> This legacy table will be split across multiple new tables with proper foreign key relationships.
+                    </div>
+                </div>
+
+                <!-- Mapping Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered mapping-table">
+                        <thead>
+                            <tr>
+                                <th class="old-column">Legacy Column</th>
+                                <th class="data-entry">Sample Data</th>
+                                <th class="data-entry">Editable Data</th>
+                                <th class="new-column dropdown-column">Target Table</th>
+                                <th class="new-column dropdown-column">Target Column</th>
+                                <th class="new-column">Data Type</th>
+                                <th class="new-column">Transform</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="old-column">
+                                    SUPPLY1
+                                    <i class="fas fa-database text-muted ms-1" title="Legacy column"></i>
+                                </td>
+                                <td class="data-entry" title="POST-IT PAGE MARKERS">POST-IT PAGE MARKERS</td>
+                                <td class="data-entry">
+                                    <input type="text" class="form-control form-control-sm" value="POST-IT PAGE MARKERS" onchange="showAlert('Edit', 'Data updated! ✏️')">
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm" onchange="updateTargetColumn(this)">
+                                        <option value="">Select table...</option>
+                                        <option value="items" selected>items</option>
+                                        <option value="categories">categories</option>
+                                        <option value="suppliers">suppliers</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select column...</option>
+                                        <option value="name" selected>name</option>
+                                        <option value="sku">sku</option>
+                                        <option value="description">description</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    VARCHAR <span class="text-danger" title="Required">*</span>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">No transform</option>
+                                        <option value="trim" selected>Trim whitespace</option>
+                                        <option value="uppercase">UPPERCASE</option>
+                                        <option value="lowercase">lowercase</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" title="Remove mapping">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="old-column">
+                                    YTODATE
+                                    <i class="fas fa-database text-muted ms-1" title="Legacy column"></i>
+                                </td>
+                                <td class="data-entry" title="ST8178">ST8178</td>
+                                <td class="data-entry">
+                                    <input type="text" class="form-control form-control-sm" value="ST8178">
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select table...</option>
+                                        <option value="items" selected>items</option>
+                                        <option value="categories">categories</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select column...</option>
+                                        <option value="name">name</option>
+                                        <option value="sku" selected>sku</option>
+                                        <option value="description">description</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    VARCHAR <span class="text-danger" title="Required">*</span>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="" selected>No transform</option>
+                                        <option value="uppercase">UPPERCASE</option>
+                                        <option value="lowercase">lowercase</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" title="Remove mapping">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="old-column">
+                                    DESC1
+                                    <i class="fas fa-database text-muted ms-1" title="Legacy column"></i>
+                                </td>
+                                <td class="data-entry" title="Laboratory bed frame">Laboratory bed frame</td>
+                                <td class="data-entry">
+                                    <input type="text" class="form-control form-control-sm" value="Laboratory bed frame">
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select table...</option>
+                                        <option value="items" selected>items</option>
+                                        <option value="categories">categories</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select column...</option>
+                                        <option value="name">name</option>
+                                        <option value="sku">sku</option>
+                                        <option value="description" selected>description</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">TEXT</td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="" selected>No transform</option>
+                                        <option value="trim">Trim whitespace</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" title="Remove mapping">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="old-column">
+                                    SUPPLY2
+                                    <i class="fas fa-database text-muted ms-1" title="Legacy column"></i>
+                                </td>
+                                <td class="data-entry" title="L03">L03</td>
+                                <td class="data-entry">
+                                    <input type="text" class="form-control form-control-sm" value="Office Supplies">
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select table...</option>
+                                        <option value="items">items</option>
+                                        <option value="categories" selected>categories</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select column...</option>
+                                        <option value="name" selected>name</option>
+                                        <option value="description">description</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    VARCHAR <span class="text-danger" title="Required">*</span>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="" selected>No transform</option>
+                                        <option value="trim">Trim whitespace</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" title="Remove mapping">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="old-column">
+                                    PRICE
+                                    <i class="fas fa-database text-muted ms-1" title="Legacy column"></i>
+                                </td>
+                                <td class="data-entry" title="450.00">450.00</td>
+                                <td class="data-entry">
+                                    <input type="text" class="form-control form-control-sm" value="450.00">
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select table...</option>
+                                        <option value="items" selected>items</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">Select column...</option>
+                                        <option value="price" selected>price</option>
+                                        <option value="current_stock">current_stock</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    DECIMAL <span class="text-danger" title="Required">*</span>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm">
+                                        <option value="">No transform</option>
+                                        <option value="decimal_format" selected>Format decimal</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" title="Remove mapping">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="old-column">
+                                    <input type="text" class="form-control form-control-sm" placeholder="Add new mapping..." style="border: 2px dashed #6c757d;">
+                                </td>
+                                <td class="data-entry">-</td>
+                                <td class="data-entry">
+                                    <input type="text" class="form-control form-control-sm" disabled>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm" disabled>
+                                        <option value="">Select table...</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm" disabled>
+                                        <option value="">Select column...</option>
+                                    </select>
+                                </td>
+                                <td class="new-column">-</td>
+                                <td class="new-column">
+                                    <select class="form-select form-select-sm" disabled>
+                                        <option value="">No transform</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" title="Add row">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Status Summary -->
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-body">
+                                <h6 class="card-title text-success">
+                                    <i class="fas fa-check-circle me-2"></i>Mapping Status
+                                </h6>
+                                <p class="card-text mb-1"><strong>5 columns mapped</strong> out of 22 legacy columns</p>
+                                <p class="card-text mb-0"><small class="text-muted">Target tables: items, categories</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-info">
+                            <div class="card-body">
+                                <h6 class="card-title text-info">
+                                    <i class="fas fa-database me-2"></i>Data Summary
+                                </h6>
+                                <p class="card-text mb-1"><strong>7,632 records</strong> ready for migration</p>
+                                <p class="card-text mb-0"><small class="text-muted">Sample data loaded and editable</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table Tab -->
+            <div class="tab-pane fade" id="users-pane" role="tabpanel">
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h4>Users Table Mapping</h4>
+                    <p class="text-muted">8 records • Simple 1:1 mapping to users table</p>
+                    <button class="btn btn-outline-primary" onclick="showAlert('Users', 'Users table mapping would be configured here')">
+                        <i class="fas fa-cog me-2"></i>Configure Mapping
+                    </button>
+                </div>
+            </div>
+
+            <!-- Supplier Table Tab -->
+            <div class="tab-pane fade" id="supplier-pane" role="tabpanel">
+                <div class="text-center py-5">
+                    <i class="fas fa-truck fa-3x text-muted mb-3"></i>
+                    <h4>Supplier Table Mapping</h4>
+                    <p class="text-muted">235 records • Maps to suppliers table with address parsing</p>
+                    <button class="btn btn-outline-primary" onclick="showAlert('Suppliers', 'Supplier table mapping would be configured here')">
+                        <i class="fas fa-cog me-2"></i>Configure Mapping
+                    </button>
+                </div>
+            </div>
+
+            <!-- Issues Table Tab -->
+            <div class="tab-pane fade" id="issues-pane" role="tabpanel">
+                <div class="text-center py-5">
+                    <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                    <h4>Issues Table Mapping</h4>
+                    <p class="text-muted">69,766 records • Complex mapping to quotes + quote_items</p>
+                    <div class="alert alert-warning d-inline-block">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Multi-table mapping required:</strong> This table splits into quotes and quote_items
+                    </div>
+                    <br>
+                    <button class="btn btn-outline-primary mt-2" onclick="showAlert('Issues', 'Issues table multi-mapping would be configured here')">
+                        <i class="fas fa-cog me-2"></i>Configure Multi-Table Mapping
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal fade" id="preview-modal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Transformation Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Preview: First 3 records after transformation</h6>
+                    
+                    <h6 class="mt-3"><i class="fas fa-table me-2"></i>items table</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>name</th>
+                                    <th>sku</th>
+                                    <th>description</th>
+                                    <th>price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>POST-IT PAGE MARKERS</td>
+                                    <td>ST8178</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>BED FRAME</td>
+                                    <td>BF2001</td>
+                                    <td>Laboratory bed frame</td>
+                                    <td>450.00</td>
+                                </tr>
+                                <tr>
+                                    <td>OFFICE CHAIR</td>
+                                    <td>OC3001</td>
+                                    <td>Ergonomic office chair</td>
+                                    <td>125.50</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="mt-3"><i class="fas fa-table me-2"></i>categories table</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Office Supplies</td>
+                                </tr>
+                                <tr>
+                                    <td>Furniture</td>
+                                </tr>
+                                <tr>
+                                    <td>Office Supplies</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-success mt-3">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Validation Passed:</strong> All mapped columns are compatible with target schema
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="showAlert('Execute', 'Ready to execute migration! 🚀')">
+                        <i class="fas fa-play me-1"></i>Execute Migration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showAlert(title, message) {
+            alert(`${title}: ${message}`);
+        }
+
+        function toggleMultiTable() {
+            const section = document.getElementById('multi-table-section');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function showPreview() {
+            const modal = new bootstrap.Modal(document.getElementById('preview-modal'));
+            modal.show();
+        }
+
+        function updateTargetColumn(selectElement) {
+            const targetTable = selectElement.value;
+            const row = selectElement.closest('tr');
+            const columnSelect = row.querySelector('td:nth-child(5) select');
+            
+            // Mock column updates based on table selection
+            if (targetTable === 'items') {
+                columnSelect.innerHTML = `
+                    <option value="">Select column...</option>
+                    <option value="name">name</option>
+                    <option value="sku">sku</option>
+                    <option value="description">description</option>
+                    <option value="price">price</option>
+                    <option value="current_stock">current_stock</option>
+                `;
+            } else if (targetTable === 'categories') {
+                columnSelect.innerHTML = `
+                    <option value="">Select column...</option>
+                    <option value="name">name</option>
+                    <option value="description">description</option>
+                `;
+            }
+        }
+
+        // Show welcome message
+        setTimeout(() => {
+            showAlert('Welcome', 'This is the Interactive Migration UI! 🎉\n\nKey features:\n• Visual column mapping\n• Editable data entries\n• Multi-table support\n• Real-time validation\n• Preview transformations');
+        }, 1000);
+    </script>
+</body>
+</html>

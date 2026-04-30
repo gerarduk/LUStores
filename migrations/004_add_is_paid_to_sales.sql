@@ -1,0 +1,8 @@
+-- Add is_paid column to sales table
+-- Migration: 004_add_is_paid_to_sales.sql
+--
+-- STATUS: APPLIED TO init.sql
+-- The following field is already in init.sql:
+-- - sales.is_paid BOOLEAN NOT NULL DEFAULT false
+--
+-- This file is retained for documentation purposes only

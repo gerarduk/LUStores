@@ -1,0 +1,66 @@
+# version: '3.8'
+
+# Set explicit project name to ensure consistency across environments
+name: lustores
+
+services:
+  app:
+    image: st7ma784/lustores:latest
+    ports:
+      - "5000:5000"
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:A1r50ft3r99@database-1:5432/university_inventory
+      - SESSION_SECRET=your-secret-key-here
+      - DEV_ADMIN_OVERRIDE=true
+      - REPL_ID=local-dev-repl
+      - REPLIT_DOMAINS=localhost:5000
+      - ISSUER_URL=http://replit-auth:3001/oidc
+    depends_on:
+      replit-auth:
+        condition: service_started
+    # restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+  # Local Replit Authentication Service
+  replit-auth:
+    image: st7ma784/replitauth:latest
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - JWT_SECRET=local-replit-jwt-secret
+      - ALLOWED_ORIGINS=http://localhost:5000
+    # restart: unless-stopped
+    # profiles:
+    #   - testing
+    #   - integration
+    #   - development
+
+ 
+
+  # Database monitoring UI
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=admin@lustores.local
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #     - PGADMIN_CONFIG_SERVER_MODE=False
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - pgadmin_data:/var/lib/pgadmin
+  #   depends_on:
+  #     - db
+  #   restart: unless-stopped
+
+volumes:
+  pgadmin_data:
+
+V6UNy32bb#$&

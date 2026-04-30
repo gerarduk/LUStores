@@ -1,0 +1,10 @@
+-- Migration: Add activity and cat3 columns to chargecodes table
+-- Date: 2025-10-17
+-- Description: Add activity (what kind of things the code is for) and cat3 (add-on person) fields to chargecodes
+--
+-- STATUS: APPLIED TO init.sql
+-- The following fields are already in init.sql:
+-- - chargecodes.activity VARCHAR(200)
+-- - chargecodes.cat3 VARCHAR(200)
+--
+-- This file is retained for documentation purposes only

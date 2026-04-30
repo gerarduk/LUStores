@@ -1,0 +1,9 @@
+-- Add location and unit fields to items table
+-- Migration: 003_add_location_and_unit_fields.sql
+--
+-- STATUS: APPLIED TO init.sql
+-- The following fields are already in init.sql:
+-- - items.unit VARCHAR(50) NOT NULL DEFAULT 'pieces'
+-- - items.location VARCHAR(200)
+--
+-- This file is retained for documentation purposes only

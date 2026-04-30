@@ -1,0 +1,6 @@
+# Git Pull Cron Job - Runs every 12 hours at 6 AM and 6 PM
+# Format: minute hour day month weekday command
+0 6,18 * * * /home/stores/LUStores/scripts/git-pull-cron.sh >/dev/null 2>&1
+
+# Alternative: Every 12 hours starting from midnight
+# 0 */12 * * * /home/stores/LUStores/scripts/git-pull-cron.sh >/dev/null 2>&1

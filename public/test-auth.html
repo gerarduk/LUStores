@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .status {
+            background: #f0f8ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .button {
+            background: #007cba;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            background: #005a87;
+        }
+        .form {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Authentication Test Page</h1>
+    
+    <div class="section">
+        <h2>Current Auth Status</h2>
+        <div class="status" id="authStatus">Checking...</div>
+    </div>
+
+    <div class="section">
+        <h2>Logout Test</h2>
+        <p>Click this link to test the server-side logout with full page reload:</p>
+        <a href="/auth/logout" class="button">🔓 Logout (Server-Side)</a>
+    </div>
+
+    <div class="section">
+        <h2>Login Test</h2>
+        <p>Test the server-side login with full page reload:</p>
+        <div class="form">
+            <form action="/auth/login-redirect" method="POST">
+                <div>
+                    <label>Email: <input type="email" name="email" required placeholder="test@example.com"></label>
+                </div>
+                <br>
+                <div>
+                    <label>Password: <input type="password" name="password" required placeholder="password"></label>
+                </div>
+                <br>
+                <input type="hidden" name="redirectTo" value="/test-auth.html">
+                <button type="submit" class="button">🔐 Login (Server-Side)</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Storage Inspection</h2>
+        <div id="storageInfo">Loading...</div>
+        <button onclick="checkStorage()" class="button">🔍 Refresh Storage Info</button>
+        <button onclick="clearStorage()" class="button">🗑️ Clear All Storage</button>
+    </div>
+
+    <script>
+        function checkAuthStatus() {
+            const token = localStorage.getItem('authToken');
+            const statusEl = document.getElementById('authStatus');
+            
+            if (token) {
+                statusEl.innerHTML = `✅ Authenticated (Token: ${token.substring(0, 20)}...)`;
+                statusEl.style.background = '#d4edda';
+                statusEl.style.color = '#155724';
+            } else {
+                statusEl.innerHTML = '❌ Not authenticated (No token found)';
+                statusEl.style.background = '#f8d7da';
+                statusEl.style.color = '#721c24';
+            }
+        }
+
+        function checkStorage() {
+            const info = [];
+            
+            // Check localStorage
+            info.push('<h3>localStorage:</h3>');
+            if (localStorage.length === 0) {
+                info.push('(empty)');
+            } else {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    info.push(`${key}: ${value ? value.substring(0, 50) : 'null'}${value && value.length > 50 ? '...' : ''}`);
+                }
+            }
+
+            // Check sessionStorage
+            info.push('<h3>sessionStorage:</h3>');
+            if (sessionStorage.length === 0) {
+                info.push('(empty)');
+            } else {
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    const value = sessionStorage.getItem(key);
+                    info.push(`${key}: ${value ? value.substring(0, 50) : 'null'}${value && value.length > 50 ? '...' : ''}`);
+                }
+            }
+
+            // Check cookies
+            info.push('<h3>document.cookie:</h3>');
+            info.push(document.cookie || '(no cookies)');
+
+            document.getElementById('storageInfo').innerHTML = info.join('<br>');
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            console.log('All storage cleared');
+            checkStorage();
+            checkAuthStatus();
+        }
+
+        // Initial load
+        checkAuthStatus();
+        checkStorage();
+        
+        // Check URL params for login results
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error')) {
+            alert('Login Error: ' + urlParams.get('error'));
+        }
+    </script>
+</body>
+</html>

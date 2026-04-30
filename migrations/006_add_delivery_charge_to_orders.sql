@@ -1,0 +1,8 @@
+-- Add delivery_charge column to orders table
+-- Migration: 006_add_delivery_charge_to_orders.sql
+--
+-- STATUS: APPLIED TO init.sql
+-- The following field is already in init.sql:
+-- - orders.delivery_charge DECIMAL(10,2) DEFAULT 0
+--
+-- This file is retained for documentation purposes only

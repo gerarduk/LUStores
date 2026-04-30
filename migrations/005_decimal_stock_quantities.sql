@@ -1,0 +1,24 @@
+-- Migration: Support decimal stock quantities
+-- Date: 2025-12-01
+-- Rationale: Allow fractional quantities for bulk items (cables, liquids, etc.)
+-- This recovers £1,481.47 in value from 156 items with fractional stock
+--
+-- STATUS: APPLIED TO init.sql
+-- All NUMERIC(10,2) types for stock quantities are already in init.sql
+-- This file is retained for documentation purposes only
+
+-- The following changes have been incorporated into init.sql:
+-- - items.current_stock: NUMERIC(10,2) NOT NULL DEFAULT 0
+-- - items.minimum_stock: NUMERIC(10,2) NOT NULL DEFAULT 0
+-- - stock_movements.quantity: NUMERIC(10,2) NOT NULL
+-- - stock_movements.previous_stock: NUMERIC(10,2) NOT NULL
+-- - stock_movements.new_stock: NUMERIC(10,2) NOT NULL
+-- - sale_items.quantity: NUMERIC(10,2) NOT NULL
+-- - order_items.quantity: NUMERIC(10,2) NOT NULL
+-- - order_items.received_quantity: NUMERIC(10,2)
+-- - quote_items.quantity: NUMERIC(10,2) NOT NULL
+
+-- Note: This migration allowed tracking of fractional inventory units like:
+-- - Cables by meter (e.g., 15.5m)
+-- - Liquids by liter (e.g., 2.75L)
+-- - Bulk materials by weight (e.g., 3.25kg)

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "LUStores API Documentation",
+  "entryPoints": [
+    "./server/routes.ts",
+    "./server/permissions.ts", 
+    "./server/index.ts",
+    "./server/dbConfig.ts",
+    "./shared/schema.ts"
+  ],
+  "out": "./docs/_build/html/api",
+  "tsconfig": "./tsconfig.typedoc.json",
+  "excludeExternals": true,
+  "excludePrivate": false,
+  "excludeProtected": false,
+  "excludeInternal": false,
+  "exclude": [
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**"
+  ],
+  "plugin": [],
+  "theme": "default",
+  "readme": "./API_README.md",
+  "includeVersion": true,
+  "sort": ["source-order"],
+  "gitRevision": "main",
+  "gitRemote": "origin",
+  "hideGenerator": false,
+  "searchInComments": true,
+  "cleanOutputDir": true,
+  "titleLink": "https://st7ma784.github.io/LUStores/",
+  "navigationLinks": {
+    "Documentation": "https://st7ma784.github.io/LUStores/",
+    "GitHub": "https://github.com/st7ma784/LUStores"
+  },
+  "sidebarLinks": {
+    "GitHub": "https://github.com/st7ma784/LUStores",
+    "Documentation": "https://st7ma784.github.io/LUStores/"
+  }
+}

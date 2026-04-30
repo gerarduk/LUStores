@@ -1,0 +1,65 @@
+node_modules
+npm-debug.log
+Dockerfile
+.dockerignore
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.DS_Store
+*.log
+dist
+.replit
+.vite
+.cache
+
+# Docker build context exclusions
+docker/replit-auth/node_modules/
+docker/*/node_modules/
+
+# Test artifacts
+coverage/
+test-results/
+playwright-report/
+reports/
+junit.xml
+
+# Logs
+logs/
+certbot/
+
+# Compiled files that shouldn't be in source
+**/*.jsx
+client/src/**/*.jsx
+client/src/components/**/*.jsx
+client/src/__tests__/**/*.jsx
+
+# Documentation that slows build
+*.md
+!README.md
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/__tests__/
+tests/
+
+# Dev samples
+dev-samples/
+performance-tests/
+
+# Diagrams and images
+diagrams/
+*.png
+*.jpg
+*.svg
+
+# Scripts not needed in container (but keep fix-build-paths.js - needed for build)
+scripts/generate-test-reports.js
+scripts/**/test-*.js
+scripts/**/*.sh
+scripts/**/*.ps1
+scripts/**/*.py
+!scripts/fix-build-paths.js

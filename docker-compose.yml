@@ -1,0 +1,261 @@
+# version: '3.8'
+
+# Set explicit project name to ensure consistency across environments
+name: lustores
+
+services:
+  app:
+    build: 
+      context: .
+      target: development
+    ports:
+      - "5000:5000"
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:password@db:5432/university_inventory
+      - SESSION_SECRET=your-secret-key-here
+      - DEV_ADMIN_OVERRIDE=true
+      - REPL_ID=local-dev-repl
+      - REPLIT_DOMAINS=localhost:5000
+      - ISSUER_URL=http://replit-auth:3001/oidc
+    depends_on:
+      db:
+        condition: service_healthy
+      replit-auth:
+        condition: service_started
+    # restart: unless-stopped
+    dns_opt:
+      - "single-request-reopen"
+    command: >
+      sh -c "
+        echo 'Waiting for database to be reachable...' &&
+        until pg_isready -h db -U postgres -d university_inventory; do
+          echo 'db not ready, retrying in 2s...' && sleep 2;
+        done &&
+        echo 'Database is ready, starting app...' &&
+        npm run dev
+      "
+    volumes:
+      - ./logs:/app/logs
+      - ./backups:/app/backups
+      # Mount source code for development hot reload, but preserve node_modules
+      - ./server:/app/server
+      - ./client:/app/client
+      - ./shared:/app/shared
+      - ./scripts:/app/scripts
+      - ./docs:/app/docs
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./tsconfig.server.json:/app/tsconfig.server.json
+      - ./vite.config.ts:/app/vite.config.ts
+      - ./tailwind.config.ts:/app/tailwind.config.ts
+      - ./postcss.config.js:/app/postcss.config.js
+      - ./jest.config.js:/app/jest.config.js
+      - ./jest.setup.js:/app/jest.setup.js
+      - ./jest.resolver.js:/app/jest.resolver.js
+      - ./drizzle.config.js:/app/drizzle.config.js
+      - ./drizzle.config.ts:/app/drizzle.config.ts
+      # Preserve node_modules from container
+      - node_modules:/app/node_modules
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+  # Local Replit Authentication Service
+  replit-auth:
+    build:
+      context: ./docker/replit-auth
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - JWT_SECRET=local-replit-jwt-secret
+      - ALLOWED_ORIGINS=http://localhost:5000
+    # restart: unless-stopped
+    # profiles:
+    #   - testing
+    #   - integration
+    #   - development
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=university_inventory
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    # restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d university_inventory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+  # Database monitoring UI
+  # pgadmin:
+  #   image: dpage/pgadmin4:latest
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=admin@lustores.local
+  #     - PGADMIN_DEFAULT_PASSWORD=admin
+  #     - PGADMIN_CONFIG_SERVER_MODE=False
+  #   ports:
+  #     - "8080:80"
+  #   volumes:
+  #     - pgadmin_data:/var/lib/pgadmin
+  #   depends_on:
+  #     - db
+  #   restart: unless-stopped
+  test:
+    build: 
+      context: .
+      target: test
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:password@test-db:5432/test_inventory
+      - SESSION_SECRET=test-secret-key
+    depends_on:
+      test-db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+      - ./coverage:/app/coverage
+    command: ["npm", "run", "test:ci"]
+    profiles:
+      - testing
+
+  test-sales:
+    build: 
+      context: .
+      target: test
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:password@test-db:5432/test_inventory
+      - SESSION_SECRET=test-secret-key
+    depends_on:
+      test-db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+      - ./coverage:/app/coverage
+    command: ["npm", "run", "test:sales"]
+    profiles:
+      - testing
+
+  test-watch:
+    build: 
+      context: .
+      target: test
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:password@test-db:5432/test_inventory
+      - SESSION_SECRET=test-secret-key
+    depends_on:
+      test-db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    command: ["npm", "run", "test:watch"]
+    profiles:
+      - testing
+    stdin_open: true
+    tty: true
+
+  test-coverage:
+    build: 
+      context: .
+      target: test
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:password@test-db:5432/test_inventory
+      - SESSION_SECRET=test-secret-key
+    depends_on:
+      test-db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+      - ./coverage:/app/coverage
+    command: ["npm", "run", "test:coverage"]
+    profiles:
+      - testing
+
+  test-integration:
+    build: 
+      context: .
+      target: test
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:password@test-db:5432/test_inventory
+      - SESSION_SECRET=test-secret-key
+      - TEST_TYPE=integration
+    depends_on:
+      test-db:
+        condition: service_healthy
+      app:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+      - ./coverage:/app/coverage
+    command: ["npm", "run", "test:integration", "--passWithNoTests"]
+    profiles:
+      - integration
+    networks:
+      - default
+
+  test-db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=test_inventory
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d test_inventory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    profiles:
+      - testing
+      - integration
+
+volumes:
+  postgres_data:
+  test_postgres_data:
+  redis_data:
+  node_modules:
+  pgadmin_data:
+
+networks:
+  default:
+    driver: bridge
+    enable_ipv6: false

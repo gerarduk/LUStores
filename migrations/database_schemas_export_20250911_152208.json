@@ -1,0 +1,3880 @@
+{
+  "export_timestamp": "2025-09-11T15:22:07.708891",
+  "export_version": "1.0",
+  "schemas": {
+    "source": {
+      "database_name": "physicsstores",
+      "database_type": "mysql",
+      "connection_info": {
+        "host": "py-it.lancs.ac.uk",
+        "port": "3306",
+        "database": "physicsstores"
+      },
+      "tables": {
+        "charge": {
+          "name": "charge",
+          "schema": "public",
+          "columns": {
+            "COSTCENTRE": {
+              "name": "COSTCENTRE",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ACTIVITY": {
+              "name": "ACTIVITY",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "PIN": {
+              "name": "PIN",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "TITLE": {
+              "name": "TITLE",
+              "data_type": "varchar(250)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "AUTHORISE1": {
+              "name": "AUTHORISE1",
+              "data_type": "varchar(25)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "AUTHORISE2": {
+              "name": "AUTHORISE2",
+              "data_type": "varchar(25)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "AUTHORISE3": {
+              "name": "AUTHORISE3",
+              "data_type": "varchar(25)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "START": {
+              "name": "START",
+              "data_type": "date",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "END": {
+              "name": "END",
+              "data_type": "date",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ONHOLD": {
+              "name": "ONHOLD",
+              "data_type": "char(1)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "issues": {
+          "name": "issues",
+          "schema": "public",
+          "columns": {
+            "DATE": {
+              "name": "DATE",
+              "data_type": "date",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "COSTCENTRE": {
+              "name": "COSTCENTRE",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "QUANTITY": {
+              "name": "QUANTITY",
+              "data_type": "double",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "STOCK_CODE": {
+              "name": "STOCK_CODE",
+              "data_type": "varchar(200)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "VALUE": {
+              "name": "VALUE",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "PERIODCODE": {
+              "name": "PERIODCODE",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ACTIVITY": {
+              "name": "ACTIVITY",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "PIN": {
+              "name": "PIN",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "USER": {
+              "name": "USER",
+              "data_type": "varchar(30)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ISSUEDTO": {
+              "name": "ISSUEDTO",
+              "data_type": "varchar(50)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "REASON": {
+              "name": "REASON",
+              "data_type": "varchar(200)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "orders": {
+          "name": "orders",
+          "schema": "public",
+          "columns": {
+            "ORDER_NO": {
+              "name": "ORDER_NO",
+              "data_type": "varchar(20)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "DATE": {
+              "name": "DATE",
+              "data_type": "date",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "SUPPLIER": {
+              "name": "SUPPLIER",
+              "data_type": "varchar(5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "STOCK_CODE": {
+              "name": "STOCK_CODE",
+              "data_type": "varchar(6)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "QTY": {
+              "name": "QTY",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "PRICE": {
+              "name": "PRICE",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "VALUE": {
+              "name": "VALUE",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "OUTSTAND": {
+              "name": "OUTSTAND",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "RECD_DATE": {
+              "name": "RECD_DATE",
+              "data_type": "date",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "periods": {
+          "name": "periods",
+          "schema": "public",
+          "columns": {
+            "PERIODCODE": {
+              "name": "PERIODCODE",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ACTIVEDATE": {
+              "name": "ACTIVEDATE",
+              "data_type": "date",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "VOUCHERDATE": {
+              "name": "VOUCHERDATE",
+              "data_type": "date",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "stock": {
+          "name": "stock",
+          "schema": "public",
+          "columns": {
+            "CODE": {
+              "name": "CODE",
+              "data_type": "varchar(6)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "PREFIX": {
+              "name": "PREFIX",
+              "data_type": "varchar(12)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "DESC1": {
+              "name": "DESC1",
+              "data_type": "varchar(60)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "DESC2": {
+              "name": "DESC2",
+              "data_type": "varchar(60)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "BALANCE": {
+              "name": "BALANCE",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "PRICE": {
+              "name": "PRICE",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ONORDER": {
+              "name": "ONORDER",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ORDERNO": {
+              "name": "ORDERNO",
+              "data_type": "varchar(10)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "MIN": {
+              "name": "MIN",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "REORDER": {
+              "name": "REORDER",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "YTODATE": {
+              "name": "YTODATE",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "PREVYR": {
+              "name": "PREVYR",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "LOCATION": {
+              "name": "LOCATION",
+              "data_type": "varchar(40)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "SIZE": {
+              "name": "SIZE",
+              "data_type": "varchar(9)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "UNITS": {
+              "name": "UNITS",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "SUPPLY1": {
+              "name": "SUPPLY1",
+              "data_type": "varchar(5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "REF1": {
+              "name": "REF1",
+              "data_type": "varchar(30)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "SUPPLY2": {
+              "name": "SUPPLY2",
+              "data_type": "varchar(5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "REF2": {
+              "name": "REF2",
+              "data_type": "varchar(30)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "SUPPLY3": {
+              "name": "SUPPLY3",
+              "data_type": "varchar(5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "REF3": {
+              "name": "REF3",
+              "data_type": "varchar(30)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "HIDDEN": {
+              "name": "HIDDEN",
+              "data_type": "char(1)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "supplier": {
+          "name": "supplier",
+          "schema": "public",
+          "columns": {
+            "CODE": {
+              "name": "CODE",
+              "data_type": "varchar(5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "NAME": {
+              "name": "NAME",
+              "data_type": "varchar(50)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ADDRESS1": {
+              "name": "ADDRESS1",
+              "data_type": "varchar(40)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ADDRESS2": {
+              "name": "ADDRESS2",
+              "data_type": "varchar(40)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ADDRESS3": {
+              "name": "ADDRESS3",
+              "data_type": "varchar(40)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ADDRESS4": {
+              "name": "ADDRESS4",
+              "data_type": "varchar(40)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "TELEPHONE": {
+              "name": "TELEPHONE",
+              "data_type": "varchar(30)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "FAX": {
+              "name": "FAX",
+              "data_type": "varchar(20)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "ACCOUNT": {
+              "name": "ACCOUNT",
+              "data_type": "varchar(25)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "NOTES": {
+              "name": "NOTES",
+              "data_type": "text",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "users": {
+          "name": "users",
+          "schema": "public",
+          "columns": {
+            "USERNAME": {
+              "name": "USERNAME",
+              "data_type": "varchar(30)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "USERPASSWORD": {
+              "name": "USERPASSWORD",
+              "data_type": "varchar(30)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "LEVEL": {
+              "name": "LEVEL",
+              "data_type": "char(1)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "vatparams": {
+          "name": "vatparams",
+          "schema": "public",
+          "columns": {
+            "VAT": {
+              "name": "VAT",
+              "data_type": "double(13,5)",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        }
+      },
+      "relationships": []
+    },
+    "target": {
+      "database_name": "university_inventory",
+      "database_type": "postgresql",
+      "connection_info": {
+        "host": "py-stores.lancs.ac.uk",
+        "port": "5432",
+        "database": "university_inventory"
+      },
+      "tables": {
+        "sessions": {
+          "name": "sessions",
+          "schema": "public",
+          "columns": {
+            "sid": {
+              "name": "sid",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "sess": {
+              "name": "sess",
+              "data_type": "json",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "expire": {
+              "name": "expire",
+              "data_type": "timestamp without time zone",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "users": {
+          "name": "users",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "email": {
+              "name": "email",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "password_hash": {
+              "name": "password_hash",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "first_name": {
+              "name": "first_name",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "last_name": {
+              "name": "last_name",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "role": {
+              "name": "role",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "'user'::character varying",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "is_active": {
+              "name": "is_active",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "true",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "must_change_password": {
+              "name": "must_change_password",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "false",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "last_login": {
+              "name": "last_login",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "profile_image_url": {
+              "name": "profile_image_url",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "notes": {
+          "name": "notes",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('notes_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "text": {
+              "name": "text",
+              "data_type": "text",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "reference_type": {
+              "name": "reference_type",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 50,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "reference_id": {
+              "name": "reference_id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_by": {
+              "name": "created_by",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "notes_created_by_fkey",
+              "column_name": "created_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "categories": {
+          "name": "categories",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('categories_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "name": {
+              "name": "name",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "description": {
+              "name": "description",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "icon": {
+              "name": "icon",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "color": {
+              "name": "color",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "items": {
+          "name": "items",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('items_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "name": {
+              "name": "name",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 200,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "sku": {
+              "name": "sku",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "description": {
+              "name": "description",
+              "data_type": "text",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "category_id": {
+              "name": "category_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "price": {
+              "name": "price",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 10,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "vat_rate": {
+              "name": "vat_rate",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "0.20",
+              "max_length": null,
+              "precision": 5,
+              "scale": 4,
+              "foreign_key_reference": null
+            },
+            "vat_included": {
+              "name": "vat_included",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "true",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "current_stock": {
+              "name": "current_stock",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "0",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "minimum_stock": {
+              "name": "minimum_stock",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "0",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "is_active": {
+              "name": "is_active",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "true",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "notes_id": {
+              "name": "notes_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "created_by": {
+              "name": "created_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_by": {
+              "name": "updated_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "items_category_id_fkey",
+              "column_name": "category_id",
+              "referenced_table": "categories",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "items_notes_id_fkey",
+              "column_name": "notes_id",
+              "referenced_table": "notes",
+              "referenced_column": "id",
+              "on_delete": "SET NULL",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "items_created_by_fkey",
+              "column_name": "created_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "items_updated_by_fkey",
+              "column_name": "updated_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "stock_movements": {
+          "name": "stock_movements",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('stock_movements_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_id": {
+              "name": "item_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "type": {
+              "name": "type",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 20,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "quantity": {
+              "name": "quantity",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "previous_stock": {
+              "name": "previous_stock",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "new_stock": {
+              "name": "new_stock",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "reason": {
+              "name": "reason",
+              "data_type": "text",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "performed_by": {
+              "name": "performed_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "stock_movements_item_id_fkey",
+              "column_name": "item_id",
+              "referenced_table": "items",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "stock_movements_performed_by_fkey",
+              "column_name": "performed_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "sales": {
+          "name": "sales",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('sales_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "sale_id": {
+              "name": "sale_id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 50,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "charge_code": {
+              "name": "charge_code",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "subtotal_amount": {
+              "name": "subtotal_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "vat_amount": {
+              "name": "vat_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "0.00",
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "total_amount": {
+              "name": "total_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "vat_applied": {
+              "name": "vat_applied",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "true",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "customer_info": {
+              "name": "customer_info",
+              "data_type": "jsonb",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "notes_id": {
+              "name": "notes_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "status": {
+              "name": "status",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "'completed'::character varying",
+              "max_length": 20,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "processed_by": {
+              "name": "processed_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "sales_notes_id_fkey",
+              "column_name": "notes_id",
+              "referenced_table": "notes",
+              "referenced_column": "id",
+              "on_delete": "SET NULL",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "sales_processed_by_fkey",
+              "column_name": "processed_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "sale_items": {
+          "name": "sale_items",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('sale_items_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "sale_id": {
+              "name": "sale_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_id": {
+              "name": "item_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_name": {
+              "name": "item_name",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 200,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "item_sku": {
+              "name": "item_sku",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "unit_price": {
+              "name": "unit_price",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 10,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "vat_rate": {
+              "name": "vat_rate",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 5,
+              "scale": 4,
+              "foreign_key_reference": null
+            },
+            "vat_amount": {
+              "name": "vat_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "0.00",
+              "max_length": null,
+              "precision": 10,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "quantity": {
+              "name": "quantity",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "subtotal": {
+              "name": "subtotal",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "total_with_vat": {
+              "name": "total_with_vat",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "sale_items_sale_id_fkey",
+              "column_name": "sale_id",
+              "referenced_table": "sales",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "sale_items_item_id_fkey",
+              "column_name": "item_id",
+              "referenced_table": "items",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "quotes": {
+          "name": "quotes",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('quotes_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "quote_id": {
+              "name": "quote_id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 50,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "charge_code": {
+              "name": "charge_code",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "subtotal_amount": {
+              "name": "subtotal_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "vat_amount": {
+              "name": "vat_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "0.00",
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "total_amount": {
+              "name": "total_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "vat_applied": {
+              "name": "vat_applied",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "true",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "customer_info": {
+              "name": "customer_info",
+              "data_type": "jsonb",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "notes_id": {
+              "name": "notes_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "status": {
+              "name": "status",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "'draft'::character varying",
+              "max_length": 20,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "session_id": {
+              "name": "session_id",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 255,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "last_accessed_at": {
+              "name": "last_accessed_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "expires_at": {
+              "name": "expires_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_by": {
+              "name": "created_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "processed_by": {
+              "name": "processed_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "processed_at": {
+              "name": "processed_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "quotes_notes_id_fkey",
+              "column_name": "notes_id",
+              "referenced_table": "notes",
+              "referenced_column": "id",
+              "on_delete": "SET NULL",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "quotes_created_by_fkey",
+              "column_name": "created_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "quotes_processed_by_fkey",
+              "column_name": "processed_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "quote_items": {
+          "name": "quote_items",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('quote_items_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "quote_id": {
+              "name": "quote_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_id": {
+              "name": "item_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_name": {
+              "name": "item_name",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 200,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "item_sku": {
+              "name": "item_sku",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "unit_price": {
+              "name": "unit_price",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 10,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "vat_rate": {
+              "name": "vat_rate",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 5,
+              "scale": 4,
+              "foreign_key_reference": null
+            },
+            "vat_amount": {
+              "name": "vat_amount",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "0.00",
+              "max_length": null,
+              "precision": 10,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "quantity": {
+              "name": "quantity",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "subtotal": {
+              "name": "subtotal",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "total_with_vat": {
+              "name": "total_with_vat",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "quote_items_quote_id_fkey",
+              "column_name": "quote_id",
+              "referenced_table": "quotes",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "quote_items_item_id_fkey",
+              "column_name": "item_id",
+              "referenced_table": "items",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "suppliers": {
+          "name": "suppliers",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "name": {
+              "name": "name",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "contact": {
+              "name": "contact",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "email": {
+              "name": "email",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "phone": {
+              "name": "phone",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "address": {
+              "name": "address",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "notes_id": {
+              "name": "notes_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "suppliers_notes_id_fkey",
+              "column_name": "notes_id",
+              "referenced_table": "notes",
+              "referenced_column": "id",
+              "on_delete": "SET NULL",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "sources": {
+          "name": "sources",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('sources_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_id": {
+              "name": "item_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "supplier_id": {
+              "name": "supplier_id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "price": {
+              "name": "price",
+              "data_type": "numeric",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 10,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "notes_id": {
+              "name": "notes_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "sources_item_id_fkey",
+              "column_name": "item_id",
+              "referenced_table": "items",
+              "referenced_column": "id",
+              "on_delete": "CASCADE",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "sources_supplier_id_fkey",
+              "column_name": "supplier_id",
+              "referenced_table": "suppliers",
+              "referenced_column": "id",
+              "on_delete": "CASCADE",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "sources_notes_id_fkey",
+              "column_name": "notes_id",
+              "referenced_table": "notes",
+              "referenced_column": "id",
+              "on_delete": "SET NULL",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "orders": {
+          "name": "orders",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('orders_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "order_id": {
+              "name": "order_id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 50,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "supplier_id": {
+              "name": "supplier_id",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "status": {
+              "name": "status",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "'pending'::character varying",
+              "max_length": 20,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "notes_id": {
+              "name": "notes_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "total_amount": {
+              "name": "total_amount",
+              "data_type": "numeric",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "created_by": {
+              "name": "created_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "received_by": {
+              "name": "received_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "received_at": {
+              "name": "received_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "orders_supplier_id_fkey",
+              "column_name": "supplier_id",
+              "referenced_table": "suppliers",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "orders_notes_id_fkey",
+              "column_name": "notes_id",
+              "referenced_table": "notes",
+              "referenced_column": "id",
+              "on_delete": "SET NULL",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "orders_created_by_fkey",
+              "column_name": "created_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "orders_received_by_fkey",
+              "column_name": "received_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "order_items": {
+          "name": "order_items",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('order_items_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "order_id": {
+              "name": "order_id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_id": {
+              "name": "item_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "item_name": {
+              "name": "item_name",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 200,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "item_sku": {
+              "name": "item_sku",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "item_description": {
+              "name": "item_description",
+              "data_type": "text",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "category_id": {
+              "name": "category_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "unit_cost": {
+              "name": "unit_cost",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 10,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "quantity": {
+              "name": "quantity",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "total_cost": {
+              "name": "total_cost",
+              "data_type": "numeric",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 12,
+              "scale": 2,
+              "foreign_key_reference": null
+            },
+            "received": {
+              "name": "received",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "false",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "received_quantity": {
+              "name": "received_quantity",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "order_items_order_id_fkey",
+              "column_name": "order_id",
+              "referenced_table": "orders",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "order_items_item_id_fkey",
+              "column_name": "item_id",
+              "referenced_table": "items",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "order_items_category_id_fkey",
+              "column_name": "category_id",
+              "referenced_table": "categories",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "chargecodes": {
+          "name": "chargecodes",
+          "schema": "public",
+          "columns": {
+            "code": {
+              "name": "code",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "title": {
+              "name": "title",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "authorised_by": {
+              "name": "authorised_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "valid_from": {
+              "name": "valid_from",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "valid_until": {
+              "name": "valid_until",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "pin": {
+              "name": "pin",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "cost_centre": {
+              "name": "cost_centre",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "notes_id": {
+              "name": "notes_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "chargecodes_authorised_by_fkey",
+              "column_name": "authorised_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "chargecodes_notes_id_fkey",
+              "column_name": "notes_id",
+              "referenced_table": "notes",
+              "referenced_column": "id",
+              "on_delete": "SET NULL",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "system_settings": {
+          "name": "system_settings",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('system_settings_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "key": {
+              "name": "key",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "value": {
+              "name": "value",
+              "data_type": "jsonb",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "description": {
+              "name": "description",
+              "data_type": "text",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "category": {
+              "name": "category",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "'general'::character varying",
+              "max_length": 50,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "is_system": {
+              "name": "is_system",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "false",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "charge_code_exclusions": {
+          "name": "charge_code_exclusions",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('charge_code_exclusions_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "charge_code": {
+              "name": "charge_code",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "item_id": {
+              "name": "item_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "category_id": {
+              "name": "category_id",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "sku_pattern": {
+              "name": "sku_pattern",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "name_pattern": {
+              "name": "name_pattern",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "exclusion_type": {
+              "name": "exclusion_type",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "'item'::character varying",
+              "max_length": 20,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "reason": {
+              "name": "reason",
+              "data_type": "text",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_by": {
+              "name": "created_by",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "charge_code_exclusions_charge_code_fkey",
+              "column_name": "charge_code",
+              "referenced_table": "chargecodes",
+              "referenced_column": "code",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "charge_code_exclusions_item_id_fkey",
+              "column_name": "item_id",
+              "referenced_table": "items",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "charge_code_exclusions_category_id_fkey",
+              "column_name": "category_id",
+              "referenced_table": "categories",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "charge_code_exclusions_created_by_fkey",
+              "column_name": "created_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "permission_definitions": {
+          "name": "permission_definitions",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('permission_definitions_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "name": {
+              "name": "name",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "description": {
+              "name": "description",
+              "data_type": "text",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "category": {
+              "name": "category",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 50,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "default_roles": {
+              "name": "default_roles",
+              "data_type": "jsonb",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "is_system": {
+              "name": "is_system",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "false",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        },
+        "user_permissions": {
+          "name": "user_permissions",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('user_permissions_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "user_id": {
+              "name": "user_id",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "permission": {
+              "name": "permission",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 100,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "granted": {
+              "name": "granted",
+              "data_type": "boolean",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": "true",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "granted_by": {
+              "name": "granted_by",
+              "data_type": "character varying",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "created_at": {
+              "name": "created_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": [
+            {
+              "constraint_name": "user_permissions_user_id_fkey",
+              "column_name": "user_id",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            },
+            {
+              "constraint_name": "user_permissions_granted_by_fkey",
+              "column_name": "granted_by",
+              "referenced_table": "users",
+              "referenced_column": "id",
+              "on_delete": "NO ACTION",
+              "on_update": "NO ACTION"
+            }
+          ]
+        },
+        "system_tests": {
+          "name": "system_tests",
+          "schema": "public",
+          "columns": {
+            "id": {
+              "name": "id",
+              "data_type": "integer",
+              "is_nullable": false,
+              "is_primary_key": true,
+              "default_value": "nextval('system_tests_id_seq'::regclass)",
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "test_type": {
+              "name": "test_type",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 32,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "status": {
+              "name": "status",
+              "data_type": "character varying",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": 32,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "output": {
+              "name": "output",
+              "data_type": "text",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "start_time": {
+              "name": "start_time",
+              "data_type": "timestamp without time zone",
+              "is_nullable": false,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "end_time": {
+              "name": "end_time",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            },
+            "duration": {
+              "name": "duration",
+              "data_type": "integer",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": null,
+              "max_length": null,
+              "precision": 32,
+              "scale": 0,
+              "foreign_key_reference": null
+            },
+            "updated_at": {
+              "name": "updated_at",
+              "data_type": "timestamp without time zone",
+              "is_nullable": true,
+              "is_primary_key": false,
+              "default_value": "now()",
+              "max_length": null,
+              "precision": null,
+              "scale": null,
+              "foreign_key_reference": null
+            }
+          },
+          "primary_keys": [],
+          "foreign_keys": []
+        }
+      },
+      "relationships": [
+        {
+          "from_table": "notes",
+          "from_column": "created_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "notes_created_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "items",
+          "from_column": "category_id",
+          "to_table": "categories",
+          "to_column": "id",
+          "constraint_name": "items_category_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "items",
+          "from_column": "notes_id",
+          "to_table": "notes",
+          "to_column": "id",
+          "constraint_name": "items_notes_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "SET NULL",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "items",
+          "from_column": "created_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "items_created_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "items",
+          "from_column": "updated_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "items_updated_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "stock_movements",
+          "from_column": "item_id",
+          "to_table": "items",
+          "to_column": "id",
+          "constraint_name": "stock_movements_item_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "stock_movements",
+          "from_column": "performed_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "stock_movements_performed_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "sales",
+          "from_column": "notes_id",
+          "to_table": "notes",
+          "to_column": "id",
+          "constraint_name": "sales_notes_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "SET NULL",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "sales",
+          "from_column": "processed_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "sales_processed_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "sale_items",
+          "from_column": "sale_id",
+          "to_table": "sales",
+          "to_column": "id",
+          "constraint_name": "sale_items_sale_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "sale_items",
+          "from_column": "item_id",
+          "to_table": "items",
+          "to_column": "id",
+          "constraint_name": "sale_items_item_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "quotes",
+          "from_column": "notes_id",
+          "to_table": "notes",
+          "to_column": "id",
+          "constraint_name": "quotes_notes_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "SET NULL",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "quotes",
+          "from_column": "created_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "quotes_created_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "quotes",
+          "from_column": "processed_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "quotes_processed_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "quote_items",
+          "from_column": "quote_id",
+          "to_table": "quotes",
+          "to_column": "id",
+          "constraint_name": "quote_items_quote_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "quote_items",
+          "from_column": "item_id",
+          "to_table": "items",
+          "to_column": "id",
+          "constraint_name": "quote_items_item_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "suppliers",
+          "from_column": "notes_id",
+          "to_table": "notes",
+          "to_column": "id",
+          "constraint_name": "suppliers_notes_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "SET NULL",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "sources",
+          "from_column": "item_id",
+          "to_table": "items",
+          "to_column": "id",
+          "constraint_name": "sources_item_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "CASCADE",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "sources",
+          "from_column": "supplier_id",
+          "to_table": "suppliers",
+          "to_column": "id",
+          "constraint_name": "sources_supplier_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "CASCADE",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "sources",
+          "from_column": "notes_id",
+          "to_table": "notes",
+          "to_column": "id",
+          "constraint_name": "sources_notes_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "SET NULL",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "orders",
+          "from_column": "supplier_id",
+          "to_table": "suppliers",
+          "to_column": "id",
+          "constraint_name": "orders_supplier_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "orders",
+          "from_column": "notes_id",
+          "to_table": "notes",
+          "to_column": "id",
+          "constraint_name": "orders_notes_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "SET NULL",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "orders",
+          "from_column": "created_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "orders_created_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "orders",
+          "from_column": "received_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "orders_received_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "order_items",
+          "from_column": "order_id",
+          "to_table": "orders",
+          "to_column": "id",
+          "constraint_name": "order_items_order_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "order_items",
+          "from_column": "item_id",
+          "to_table": "items",
+          "to_column": "id",
+          "constraint_name": "order_items_item_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "order_items",
+          "from_column": "category_id",
+          "to_table": "categories",
+          "to_column": "id",
+          "constraint_name": "order_items_category_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "chargecodes",
+          "from_column": "authorised_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "chargecodes_authorised_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "chargecodes",
+          "from_column": "notes_id",
+          "to_table": "notes",
+          "to_column": "id",
+          "constraint_name": "chargecodes_notes_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "SET NULL",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "charge_code_exclusions",
+          "from_column": "charge_code",
+          "to_table": "chargecodes",
+          "to_column": "code",
+          "constraint_name": "charge_code_exclusions_charge_code_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "charge_code_exclusions",
+          "from_column": "item_id",
+          "to_table": "items",
+          "to_column": "id",
+          "constraint_name": "charge_code_exclusions_item_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "charge_code_exclusions",
+          "from_column": "category_id",
+          "to_table": "categories",
+          "to_column": "id",
+          "constraint_name": "charge_code_exclusions_category_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "charge_code_exclusions",
+          "from_column": "created_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "charge_code_exclusions_created_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "user_permissions",
+          "from_column": "user_id",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "user_permissions_user_id_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "from_table": "user_permissions",
+          "from_column": "granted_by",
+          "to_table": "users",
+          "to_column": "id",
+          "constraint_name": "user_permissions_granted_by_fkey",
+          "cardinality": "one-to-many",
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        }
+      ]
+    }
+  }
+}

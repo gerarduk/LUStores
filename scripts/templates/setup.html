@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration UI Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .setup-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .setup-card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0 0.5rem;
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+        .step.active {
+            background: #007bff;
+            color: white;
+        }
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+        .connection-status {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .status-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .status-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .status-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="setup-container">
+            <div class="card setup-card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-database me-2"></i>
+                        Legacy Data Migration Setup
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step active" id="step-1">
+                            <i class="fas fa-plug mb-2"></i>
+                            <div>Database Connections</div>
+                        </div>
+                        <div class="step" id="step-2">
+                            <i class="fas fa-upload mb-2"></i>
+                            <div>Load Legacy Data</div>
+                        </div>
+                        <div class="step" id="step-3">
+                            <i class="fas fa-table mb-2"></i>
+                            <div>Column Mapping</div>
+                        </div>
+                    </div>
+
+                    <!-- Connection Setup Form -->
+                    <div id="connection-setup">
+                        <h4 class="mb-3">Database Connection Setup</h4>
+                        
+                        <!-- PostgreSQL Connection -->
+                        <div class="mb-4">
+                            <h5><i class="fas fa-elephant me-2"></i>PostgreSQL (New Database)</h5>
+                            <div class="mb-3">
+                                <label for="pg-connection" class="form-label">Connection String</label>
+                                <input type="text" class="form-control" id="pg-connection" 
+                                       placeholder="postgresql://username:password@localhost:5432/database"
+                                       value="postgresql://postgres:password@localhost:5432/lustores">
+                                <div class="form-text">Format: postgresql://user:password@host:port/database</div>
+                            </div>
+                        </div>
+
+                        <!-- MySQL Connection -->
+                        <div class="mb-4">
+                            <h5><i class="fas fa-database me-2"></i>Legacy Database Source</h5>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="data-source" id="source-mysql" value="mysql">
+                                    <label class="form-check-label" for="source-mysql">
+                                        <strong>MySQL Database Connection</strong>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="data-source" id="source-file" value="file" checked>
+                                    <label class="form-check-label" for="source-file">
+                                        <strong>SQL Backup File</strong>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- MySQL Connection Details -->
+                            <div id="mysql-config" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="mysql-host" class="form-label">Host</label>
+                                            <input type="text" class="form-control" id="mysql-host" value="py-it.lancs.ac.uk">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="mysql-port" class="form-label">Port</label>
+                                            <input type="number" class="form-control" id="mysql-port" value="3306">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="mysql-user" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="mysql-user">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="mysql-password" class="form-label">Password</label>
+                                            <input type="password" class="form-control" id="mysql-password">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="mysql-database" class="form-label">Database Name</label>
+                                    <input type="text" class="form-control" id="mysql-database" value="physics_stores">
+                                </div>
+                            </div>
+
+                            <!-- SQL File Upload -->
+                            <div id="file-config">
+                                <div class="mb-3">
+                                    <label for="sql-file" class="form-label">SQL Backup File Path</label>
+                                    <input type="text" class="form-control" id="sql-file" 
+                                           placeholder="/path/to/legacy_backup.sql">
+                                    <div class="form-text">Full path to the SQL backup file containing legacy data</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Connection Status -->
+                        <div id="connection-status" class="connection-status status-info" style="display: none;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <span id="status-message">Ready to test connections...</span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-primary" id="test-connections">
+                                <i class="fas fa-plug me-2"></i>Test Connections
+                            </button>
+                            <button type="button" class="btn btn-primary" id="proceed-to-data" disabled>
+                                <i class="fas fa-arrow-right me-2"></i>Proceed to Data Loading
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Data Loading Section -->
+                    <div id="data-loading" style="display: none;">
+                        <h4 class="mb-3">Load Legacy Data</h4>
+                        
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-success" id="load-data">
+                                <i class="fas fa-upload me-2"></i>Load Legacy Data
+                            </button>
+                        </div>
+
+                        <div id="loading-progress" style="display: none;">
+                            <div class="progress mb-3">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div id="loading-status">Loading data...</div>
+                        </div>
+
+                        <div id="data-summary" style="display: none;">
+                            <h5>Data Summary</h5>
+                            <div id="table-summary"></div>
+                            
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" id="proceed-to-mapping">
+                                    <i class="fas fa-arrow-right me-2"></i>Proceed to Column Mapping
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data source toggle
+        document.querySelectorAll('input[name="data-source"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const mysqlConfig = document.getElementById('mysql-config');
+                const fileConfig = document.getElementById('file-config');
+                
+                if (this.value === 'mysql') {
+                    mysqlConfig.style.display = 'block';
+                    fileConfig.style.display = 'none';
+                } else {
+                    mysqlConfig.style.display = 'none';
+                    fileConfig.style.display = 'block';
+                }
+            });
+        });
+
+        // Test connections
+        document.getElementById('test-connections').addEventListener('click', async function() {
+            const statusDiv = document.getElementById('connection-status');
+            const statusMessage = document.getElementById('status-message');
+            const proceedBtn = document.getElementById('proceed-to-data');
+            
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'connection-status status-info';
+            statusMessage.textContent = 'Testing connections...';
+            
+            const useMySQL = document.getElementById('source-mysql').checked;
+            const connectionData = {
+                pg_connection: document.getElementById('pg-connection').value,
+                use_mysql: useMySQL
+            };
+            
+            if (useMySQL) {
+                connectionData.mysql_host = document.getElementById('mysql-host').value;
+                connectionData.mysql_port = document.getElementById('mysql-port').value;
+                connectionData.mysql_user = document.getElementById('mysql-user').value;
+                connectionData.mysql_password = document.getElementById('mysql-password').value;
+                connectionData.mysql_database = document.getElementById('mysql-database').value;
+            }
+            
+            try {
+                const response = await fetch('/setup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(connectionData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDiv.className = 'connection-status status-success';
+                    statusMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Connections successful!';
+                    proceedBtn.disabled = false;
+                    
+                    // Update step indicator
+                    document.getElementById('step-1').classList.add('completed');
+                    document.getElementById('step-1').classList.remove('active');
+                } else {
+                    statusDiv.className = 'connection-status status-error';
+                    statusMessage.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Connection failed: ${result.error}`;
+                    proceedBtn.disabled = true;
+                }
+            } catch (error) {
+                statusDiv.className = 'connection-status status-error';
+                statusMessage.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Error: ${error.message}`;
+                proceedBtn.disabled = true;
+            }
+        });
+
+        // Proceed to data loading
+        document.getElementById('proceed-to-data').addEventListener('click', function() {
+            document.getElementById('connection-setup').style.display = 'none';
+            document.getElementById('data-loading').style.display = 'block';
+            
+            document.getElementById('step-2').classList.add('active');
+        });
+
+        // Load legacy data
+        document.getElementById('load-data').addEventListener('click', async function() {
+            const progressDiv = document.getElementById('loading-progress');
+            const statusDiv = document.getElementById('loading-status');
+            const summaryDiv = document.getElementById('data-summary');
+            
+            progressDiv.style.display = 'block';
+            
+            const useMySQL = document.getElementById('source-mysql').checked;
+            const loadData = {
+                use_mysql: useMySQL
+            };
+            
+            if (!useMySQL) {
+                loadData.sql_file = document.getElementById('sql-file').value;
+            }
+            
+            try {
+                const response = await fetch('/load_legacy_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loadData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Show data summary
+                    const tableSummary = document.getElementById('table-summary');
+                    let summaryHTML = '<div class="row">';
+                    
+                    for (const [table, count] of Object.entries(result.record_counts)) {
+                        summaryHTML += `
+                            <div class="col-md-4 mb-2">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">${table}</h6>
+                                        <p class="card-text">${count.toLocaleString()} records</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    summaryHTML += '</div>';
+                    tableSummary.innerHTML = summaryHTML;
+                    
+                    progressDiv.style.display = 'none';
+                    summaryDiv.style.display = 'block';
+                    
+                    // Update step indicator
+                    document.getElementById('step-2').classList.add('completed');
+                    document.getElementById('step-2').classList.remove('active');
+                } else {
+                    statusDiv.textContent = `Error loading data: ${result.error}`;
+                }
+            } catch (error) {
+                statusDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+
+        // Proceed to mapping
+        document.getElementById('proceed-to-mapping').addEventListener('click', function() {
+            window.location.href = '/';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+events {
+    worker_connections 1024;
+}
+
+http {
+    # Basic settings
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    server_tokens off;
+
+    # MIME types
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    # Enhanced logging for debugging
+    log_format detailed '$remote_addr - $remote_user [$time_local] "$request" '
+                       '$status $body_bytes_sent "$http_referer" '
+                       '"$http_user_agent" "$http_x_forwarded_for" '
+                       'upstream_addr="$upstream_addr" '
+                       'upstream_status="$upstream_status" '
+                       'upstream_response_time="$upstream_response_time" '
+                       'request_time="$request_time"';
+
+    access_log /var/log/nginx/access.log detailed;
+    error_log /var/log/nginx/error.log info;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/atom+xml
+        image/svg+xml;
+
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+    limit_req_zone $binary_remote_addr zone=login:10m rate=5r/m;
+
+    # DNS resolver for dynamic upstream resolution
+    # This is critical for Docker environments where containers may restart with new IPs
+    resolver 127.0.0.11 valid=10s ipv6=off;
+    resolver_timeout 5s;
+
+    # HTTP to HTTPS redirect server
+    server {
+        listen 80;
+        server_name _;
+
+        # Dynamic DNS resolution - forces nginx to resolve app service on each request
+        set $upstream_app app:5000;
+
+        # Internal health check endpoint (no redirect)
+        location = /health {
+            proxy_pass http://$upstream_app/health;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto http;
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 5s;
+            proxy_read_timeout 5s;
+            access_log off;
+
+            # Return 200 if upstream is down (for Docker health checks)
+            error_page 502 503 504 = @health_check_fallback;
+        }
+
+        # Fallback for health check when app is down
+        location @health_check_fallback {
+            return 200 "nginx healthy - app starting\n";
+            add_header Content-Type text/plain;
+        }
+
+        # Internal nginx status endpoint for health checks
+        location = /nginx-health {
+            access_log off;
+            return 200 "nginx healthy\n";
+            add_header Content-Type text/plain;
+        }
+        
+        # Let's Encrypt ACME challenge
+        location /.well-known/acme-challenge/ {
+            root /var/www/certbot;
+        }
+        
+        # Redirect all other HTTP traffic to HTTPS
+        location / {
+            return 301 https://$host$request_uri;
+        }
+    }
+
+    # HTTPS server - only enabled if SSL certificates exist
+    server {
+        listen 443 ssl;
+        http2 on;
+        server_name _;
+
+        # Dynamic DNS resolution - forces nginx to resolve app service on each request
+        # This prevents 502 errors when Watchtower updates the app container
+        set $upstream_app app:5000;
+
+        # SSL Configuration
+        ssl_certificate /etc/letsencrypt/live/${NGINX_HOST}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/${NGINX_HOST}/privkey.pem;
+
+        # SSL Security Settings (compatible with self-signed certificates)
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA;
+        ssl_prefer_server_ciphers off;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
+
+        # Disable OCSP stapling for self-signed certificates
+        # Note: OCSP stapling requires valid CA certificates and will fail with self-signed certs
+        # ssl_stapling on;
+        # ssl_stapling_verify on;
+        # ssl_trusted_certificate /etc/letsencrypt/live/${NGINX_HOST}/chain.pem;
+        # resolver 8.8.8.8 8.8.4.4 valid=300s;
+        # resolver_timeout 5s;
+
+        # Security Headers (adjusted for self-signed certificates)
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header X-Frame-Options DENY always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self'; media-src 'self'; object-src 'none'; child-src 'none'; worker-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'; manifest-src 'self';" always;
+
+        # Client max body size for file uploads
+        client_max_body_size 50M;
+
+        # Proxy settings with timeouts
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        proxy_cache_bypass $http_upgrade;
+        proxy_buffering off;
+
+        # Connection timeouts - more generous for production
+        proxy_connect_timeout 30s;
+        proxy_send_timeout 30s;
+        proxy_read_timeout 120s;
+
+        # Retry configuration with fallback
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_next_upstream_tries 3;
+        proxy_next_upstream_timeout 30s;
+
+        # Error page for 502/503/504 errors
+        error_page 502 503 504 /error-502.html;
+        location = /error-502.html {
+            root /etc/nginx;
+            internal;
+        }
+
+        # API routes with rate limiting and enhanced timeout for complex queries
+        location /api/ {
+            limit_req zone=api burst=20 nodelay;
+            proxy_pass http://$upstream_app;
+            proxy_intercept_errors on;
+            error_page 502 503 504 /error-502.html;
+
+            # Increase timeout for complex queries like enhanced suppliers
+            proxy_read_timeout 60s;
+        }
+
+        # JSON error handler for API routes
+        location @api_error {
+            add_header Content-Type application/json always;
+            return 503 '{"error": "Service temporarily unavailable", "message": "The API service is currently unavailable. Please try again in a moment."}';
+        }
+
+        # Auth routes with stricter rate limiting
+        location /auth/ {
+            limit_req zone=login burst=5 nodelay;
+            proxy_pass http://$upstream_app;
+            proxy_intercept_errors on;
+            error_page 502 503 504 /error-502.html;
+        }
+
+        # WebSocket support for Vite HMR (development)
+        location /ws {
+            proxy_pass http://$upstream_app;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+
+        # Font files from webfonts directory with specific headers and MIME types
+        location ~* ^/webfonts/.*\.(woff2?|ttf|eot|otf)$ {
+            # Handle CORS preflight requests
+            if ($request_method = 'OPTIONS') {
+                add_header 'Access-Control-Allow-Origin' '*';
+                add_header 'Access-Control-Allow-Methods' 'GET, OPTIONS';
+                add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept, Authorization';
+                add_header 'Access-Control-Max-Age' 1728000;
+                add_header 'Content-Type' 'text/plain; charset=utf-8';
+                add_header 'Content-Length' 0;
+                return 204;
+            }
+
+            proxy_pass http://$upstream_app;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            add_header Access-Control-Allow-Origin "*";
+            add_header Access-Control-Allow-Methods "GET, OPTIONS";
+            add_header Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization";
+        }
+
+        # Static files with caching
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            proxy_pass http://$upstream_app;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+        }
+
+        # Assets directory (Vite build output) - proxy to app where assets are built
+        location /assets/ {
+            proxy_pass http://$upstream_app;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            proxy_intercept_errors on;
+            error_page 502 503 504 /error-502.html;
+        }
+
+        # Assets fallback - return 404 for missing assets instead of HTML error pages
+        location @assets_fallback {
+            return 404;
+        }
+
+        # Other static files with caching
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+            proxy_pass http://$upstream_app;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            proxy_intercept_errors on;
+            error_page 502 503 504 /error-502.html;
+        }
+
+        # Static files fallback - return 404 for missing static files
+        location @static_fallback {
+            return 404;
+        }
+
+        # Health check endpoint with improved error handling
+        location /health {
+            proxy_pass http://$upstream_app/health;
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 5s;
+            proxy_read_timeout 5s;
+            proxy_set_header X-Forwarded-Proto https;
+            access_log off;
+
+            # Custom error handling for health checks
+            error_page 502 503 504 = @health_fallback;
+        }
+
+        # Fallback for health check failures
+        location @health_fallback {
+            return 200 "nginx healthy - app unavailable\n";
+            add_header Content-Type text/plain;
+        }
+
+        # All other requests
+        location / {
+            proxy_pass http://$upstream_app;
+            proxy_intercept_errors on;
+            error_page 502 503 504 /error-502.html;
+        }
+    }
+}

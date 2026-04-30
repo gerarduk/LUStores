@@ -1,0 +1,6 @@
+item_name,item_sku,quantity,unit_cost,item_description,category_id
+"Office Chair","CHAIR-001",5,89.99,"Ergonomic office chair with adjustable height",1
+"Laptop Stand","STAND-002",10,24.99,"Adjustable aluminum laptop stand",2
+"Wireless Mouse","MOUSE-003",25,15.99,"Bluetooth wireless mouse with optical tracking",2
+"Desk Lamp","LAMP-004",8,42.50,"LED desk lamp with USB charging port",1
+"Monitor","MON-005",3,299.99,"24-inch Full HD LED monitor",2

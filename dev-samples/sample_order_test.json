@@ -1,0 +1,31 @@
+{
+  "orderId": "ORD-2025-002",
+  "supplier": {
+    "id": "SUPP-001", 
+    "name": "Office Supplies Ltd",
+    "contact": "John Smith",
+    "email": "orders@officesupplies.co.uk",
+    "phone": "+44 1234 567890"
+  },
+  "subtotal": 250.00,
+  "vatRate": 0.20,
+  "vatAmount": 50.00,
+  "total": 300.00,
+  "status": "pending",
+  "receivedDate": null,
+  "notes": "Test order for final verification",
+  "items": [
+    {
+      "itemId": 2001,
+      "itemSku": "TEST-KEYBOARD-001",
+      "itemName": "Wireless Keyboard",
+      "description": "Bluetooth wireless keyboard with backlight",
+      "categoryId": 1,
+      "quantity": 10,
+      "unitCost": 25.00,
+      "vatRate": 0.20,
+      "vatAmount": 50.00,
+      "totalCost": 250.00
+    }
+  ]
+}

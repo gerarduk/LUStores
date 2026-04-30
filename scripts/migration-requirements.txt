@@ -1,0 +1,2 @@
+psycopg2-binary
+PyMySQL>=1.0.0

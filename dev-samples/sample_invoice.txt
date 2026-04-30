@@ -1,0 +1,29 @@
+INVOICE
+
+From: Office Supply Company Ltd
+Email: orders@officesupply.co.uk
+Phone: +44 20 1234 5678
+Address: 123 Business Street, London, E1 6AN
+
+Invoice Number: INV-2025-001
+Invoice Date: 10/07/2025
+Due Date: 09/08/2025
+
+Bill To:
+University Physics Department
+Science Building
+University Campus
+
+Description                           Qty    Unit Price    Total
+---------------------------------------------------------------
+LAB-EQUIP-001  Laboratory Equipment   2      £125.00      £250.00
+DESK-LAMP-002  LED Desk Lamps        5      £45.00       £225.00
+CHAIR-ERG-003  Ergonomic Chairs      3      £150.00      £450.00
+---------------------------------------------------------------
+
+Subtotal:                                               £925.00
+VAT (20%):                                             £185.00
+---------------------------------------------------------------
+Total:                                                £1,110.00
+
+Payment Terms: Net 30 days

@@ -1,0 +1,239 @@
+# Production override for docker-compose
+services:
+  # Nginx reverse proxy with SSL termination
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./nginx/nginx-http.conf:/etc/nginx/nginx-http.conf:ro
+      - ./nginx/error-502.html:/etc/nginx/error-502.html:ro
+      - ./scripts/nginx-startup.sh:/usr/local/bin/nginx-startup.sh:ro
+      - ./scripts/nginx-watchtower-monitor.sh:/usr/local/bin/nginx-watchtower-monitor.sh:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./logs/nginx:/var/log/nginx
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+      - NGINX_HOST=${DOMAIN:-localhost}
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nc", "-z", "127.0.0.1", "80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    command: ["/bin/sh", "-c", "apk add --no-cache netcat-openbsd && sh /usr/local/bin/nginx-startup.sh"]
+    networks:
+      - lustores_network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=university_inventory
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      # Handle existing data gracefully
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --auth-local=scram-sha-256
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - /db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d university_inventory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - lustores_network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - lustores_network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+  # Certbot for Let's Encrypt certificate management
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+      - ./logs/certbot:/var/log/certbot
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+      - EMAIL=${EMAIL:-admin@localhost}
+      - CERTBOT_STAGING=${CERTBOT_STAGING:-}
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    restart: unless-stopped
+    networks:
+      - lustores_network
+
+  # One-time certificate setup service
+  certbot-init:
+    image: certbot/certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+      - ./logs/certbot:/var/log/certbot
+      - ./scripts/generate-ssl.sh:/generate-ssl.sh:ro
+      - ./scripts/generate-self-signed-ssl.sh:/generate-self-signed-ssl.sh:ro
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+      - EMAIL=${EMAIL:-admin@localhost}
+      - CERTBOT_STAGING=${CERTBOT_STAGING:-}
+      - USE_SELF_SIGNED=${USE_SELF_SIGNED:-false}
+    entrypoint: ["/bin/sh"]
+    command: ["/generate-ssl.sh"]
+    profiles:
+      - init
+    depends_on:
+      - nginx
+    networks:
+      - lustores_network
+
+  app:
+    image: st7ma784/lustores:latest
+    pull_policy: always
+    ports:
+      # Remove external port exposure - nginx handles it
+      - "5000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - HTTPS=${HTTPS:-true}
+      - FORCE_HTTPS=${FORCE_HTTPS:-true}
+      - DOMAIN=${DOMAIN:-localhost}
+      - EMAIL=${EMAIL:-admin@localhost}
+      - REPL_ID=${REPL_ID:-prod-repl}
+      - REPLIT_DOMAINS=${REPLIT_DOMAINS}
+      - ISSUER_URL=${ISSUER_URL}
+    depends_on:
+      db:
+        condition: service_healthy
+      replit-auth:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - lustores_network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"  # Enable watchtower monitoring
+      - "com.centurylinklabs.watchtower.monitor-only=false"  # Allow automatic updates
+
+  replit-auth:
+    image: st7ma784/replitauth:latest
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET}
+      - ALLOWED_ORIGINS=https://${DOMAIN:-localhost}
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - lustores_network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"  # Enable watchtower monitoring
+      - "com.centurylinklabs.watchtower.stop-signal=SIGTERM"  # Graceful shutdown signal
+
+  # Watchtower for automatic container updates
+  watchtower:
+    image: containrrr/watchtower:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_INCLUDE_STOPPED=true
+      - WATCHTOWER_REVIVE_STOPPED=false
+      - WATCHTOWER_NOTIFICATION_WEBHOOK_URL=${WATCHTOWER_NOTIFICATION_WEBHOOK_URL:-http://app:5000/api/webhook/watchtower}
+      - WATCHTOWER_MONITOR_ONLY=false  # Allow updates
+      - WATCHTOWER_SCHEDULE=0 */15 * * * *  # Check every 15 minutes (cron format)
+      - WATCHTOWER_LABEL_ENABLE=true  # Only monitor containers with watchtower labels
+      - API_VERSION=1.53
+    restart: unless-stopped
+    depends_on:
+      - app
+    networks:
+      - lustores_network
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"  # Don't update watchtower itself
+
+  # # GitHub Actions self-hosted runner - Simplified Working Configuration
+  # githubrunner:
+  #   image: myoung34/github-runner:latest
+  #   environment:
+  #     # Core required settings (minimal working config)
+  #     - REPO_URL=https://github.com/st7ma784/LUStores
+  #     - RUNNER_NAME=${RUNNER_NAME:-lustores-prod-runner}
+  #     - RUNNER_TOKEN=${RUNNER_TOKEN}
+      
+  #     # Optional production settings
+  #     - LABELS=${RUNNER_LABELS:-lustores,production,docker,self-hosted}
+  #     - EPHEMERAL=${EPHEMERAL_RUNNER:-true}
+  #     - DISABLE_AUTOMATIC_DEREGISTRATION=${DISABLE_AUTO_DEREG:-false}
+  #     - RUNNER_GROUP=${RUNNER_GROUP:-default}
+      
+  #     # Security settings
+  #     - RUNNER_ALLOW_RUNASROOT=true
+      
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - github_runner_data:/tmp/runner
+  #   restart: unless-stopped
+  #   privileged: true
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pgrep -f 'Runner.Listener' > /dev/null || exit 1"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 60s
+  #   networks:
+  #     - lustores_network
+  #   labels:
+  #     - com.centurylinklabs.watchtower.enable=true
+
+# Define custom network for better service discovery
+networks:
+  lustores_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  github_runner_data:
+  redis_data:

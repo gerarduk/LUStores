@@ -1,0 +1,48 @@
+# Alternative: GitHub Actions Runner Controller
+# This uses the official GitHub Actions Runner Controller for Kubernetes
+# For production, this is often more reliable than Docker-based runners
+
+services:
+  # Option 1: Use GitHub's official runner image with App authentication
+  githubrunner-official:
+    image: ghcr.io/actions/actions-runner:latest
+    environment:
+      - REPO_URL=https://github.com/st7ma784/LUStores
+      - RUNNER_NAME=${RUNNER_NAME:-lustores-prod-runner}
+      - ACCESS_TOKEN=${GITHUB_APP_TOKEN}
+      - RUNNER_WORKDIR=/tmp/runner/work
+      - RUNNER_SCOPE=repo
+      - LABELS=${RUNNER_LABELS:-lustores,production,docker,self-hosted}
+      - EPHEMERAL=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - github_runner_data:/tmp/runner
+    restart: unless-stopped
+    privileged: true
+    profiles:
+      - github-official
+    
+  # Option 2: Custom runner with GitHub App JWT generation
+  githubrunner-jwt:
+    build:
+      context: ./docker/github-runner-jwt
+      dockerfile: Dockerfile
+    environment:
+      - REPO_URL=https://github.com/st7ma784/LUStores
+      - RUNNER_NAME=${RUNNER_NAME:-lustores-prod-runner}
+      - GITHUB_APP_ID=${GITHUB_APP_ID}
+      - GITHUB_APP_INSTALLATION_ID=${GITHUB_APP_INSTALLATION_ID}
+      - GITHUB_APP_PRIVATE_KEY_FILE=/app/secrets/github-app-key.pem
+      - RUNNER_WORKDIR=/tmp/runner/work
+      - LABELS=${RUNNER_LABELS:-lustores,production,docker,self-hosted}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - github_runner_data:/tmp/runner
+      - ${GITHUB_APP_PRIVATE_KEY_FILE}:/app/secrets/github-app-key.pem:ro
+    restart: unless-stopped
+    privileged: true
+    profiles:
+      - github-jwt
+
+volumes:
+  github_runner_data:

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>502 - Suboptimal Deviation From Normality</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            padding: 60px 40px;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .error-code {
+            font-size: 120px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .error-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .error-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .message-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .message-box p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .message-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .contact-info strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .contact-info p {
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .contact-person {
+            font-size: 18px;
+            font-weight: 600;
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .tech-details {
+            background: #f0f0f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #555;
+            text-align: left;
+            overflow-x: auto;
+        }
+
+        .tech-details strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">⚙️</div>
+        
+        <div class="error-code">502</div>
+        <h1 class="error-title">Suboptimal Deviation From Normality</h1>
+        <p class="error-subtitle">Our system encountered a minor hiccup</p>
+
+        <div class="message-box">
+            <p><strong>What happened?</strong></p>
+            <p>The application server isn't currently responding. This is typically temporary and usually resolves itself faster than you can make a cup of tea. ☕</p>
+            <p style="margin-top: 15px;"><strong>What should you do?</strong></p>
+            <p>Try refreshing the page in a few moments. If the issue persists, please contact your IT department.</p>
+        </div>
+
+        <div class="contact-info">
+            <strong>📞 Need Help?</strong>
+            <p>If this problem persists or you need immediate assistance, please reach out to:</p>
+            <span class="contact-person">S Mander</span>
+            <p>Your friendly neighborhood IT contact who keeps the digital wheels turning</p>
+        </div>
+
+        <div class="tech-details">
+            <strong>Technical Details:</strong>
+            <div>Error: Bad Gateway (502)</div>
+            <div>Status: Application Server Unreachable</div>
+            <div>Likely Cause: Server restart, deployment in progress, or temporal anomaly</div>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for your patience. We're working to get things back to normal. ✨</p>
+        </div>
+    </div>
+</body>
+</html>

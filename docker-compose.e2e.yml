@@ -1,0 +1,46 @@
+services:
+  app:
+    environment:
+      - NODE_ENV=test
+      - DATABASE_URL=postgresql://postgres:password@db:5432/university_inventory
+      - DEV_ADMIN_OVERRIDE=false
+      - CI=true
+      - SESSION_SECRET=test-secret-key-for-e2e
+      - BYPASS_AUTH=false
+      - FORCE_DB_INIT=true
+
+  # Ensure database has proper configuration for e2e tests
+  db:
+    environment:
+      - POSTGRES_DB=university_inventory
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - e2e_postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  playwright-tests:
+    build:
+      context: .
+      target: e2e-test
+    environment:
+      - NODE_ENV=test
+      - DEV_ADMIN_OVERRIDE=false
+      - CI=true
+      - TEST_BASE_URL=http://app:5000
+      - DATABASE_URL=postgresql://postgres:password@db:5432/university_inventory
+      - PLAYWRIGHT_BROWSERS_PATH=/app/.cache/ms-playwright
+    depends_on:
+      app:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    volumes:
+      - ./test-results:/app/test-results
+      - ./playwright-report:/app/playwright-report
+      - ./coverage:/app/coverage
+    command: ["npm", "run", "test:e2e-comprehensive"]
+
+volumes:
+  e2e-test-results:
+  e2e_postgres_data:

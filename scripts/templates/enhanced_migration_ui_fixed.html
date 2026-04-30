@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced MariaDB to PostgreSQL Migration Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .migration-container { padding: 1rem; }
+        .connection-section { background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        .column-mapping-section { background: #e9ecef; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+        .data-grid { max-height: 400px; overflow-y: auto; }
+        .transformation-panel { background: #fff3cd; padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
+        .manual-entry-row { background: #d4edda; }
+        .validation-error { background: #f8d7da; }
+        .column-header { position: sticky; top: 0; background: #fff; z-index: 10; }
+        .data-cell { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+        .editable-cell { background: #e3f2fd; }
+        .preview-value { font-family: monospace; background: #f1f3f4; padding: 0.25rem; border-radius: 4px; }
+        
+        /* Enhanced drag-drop styles */
+        .column-item {
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            cursor: move;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .column-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0,123,255,0.25);
+        }
+        
+        .column-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+        
+        .column-item.source-column {
+            border-left: 4px solid #28a745;
+        }
+        
+        .column-item.target-column {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .column-item.mapped {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .drop-zone {
+            min-height: 50px;
+            border: 2px dashed #dee2e6;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.drag-over {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+        
+        .mapping-line {
+            background: #17a2b8;
+            color: white;
+            padding: 5px 10px;
+            margin: 2px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        .mapping-line .remove-mapping {
+            float: right;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        
+        .mapping-line .remove-mapping:hover {
+            opacity: 1;
+        }
+        
+        .column-type {
+            font-size: 0.8em;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .auto-map-result {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid migration-container">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <h1><i class="fas fa-exchange-alt me-2"></i>Enhanced Migration Tool</h1>
+                <p class="text-muted">Advanced MariaDB to PostgreSQL migration with detailed column control</p>
+            </div>
+        </div>
+
+        <!-- Connection Section -->
+        <div class="connection-section">
+            <h3><i class="fas fa-plug me-2"></i>Database Connections</h3>
+            <div class="row">
+                <!-- MariaDB Connection -->
+                <div class="col-md-6">
+                    <h5><i class="fas fa-database me-1"></i>MariaDB (Source)</h5>
+                    <div class="mb-2">
+                        <input type="text" class="form-control form-control-sm" id="mariadb-host" placeholder="Host" value="py-it.lancs.ac.uk">
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="mariadb-port" placeholder="Port" value="3306">
+                        </div>
+                        <div class="col-8">
+                            <input type="text" class="form-control form-control-sm" id="mariadb-database" placeholder="Database" value="physicsstores">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <input type="text" class="form-control form-control-sm" id="mariadb-user" placeholder="Username" value="PhysicsUser">
+                        </div>
+                        <div class="col-6">
+                            <input type="password" class="form-control form-control-sm" id="mariadb-password" placeholder="Password" value="V9T6Y4X4">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PostgreSQL Connection -->
+                <div class="col-md-6">
+                    <h5><i class="fas fa-elephant me-1"></i>PostgreSQL (Target)</h5>
+                    <div class="mb-2">
+                        <input type="text" class="form-control form-control-sm" id="postgresql-host" placeholder="Host" value="py-stores.lancs.ac.uk">
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-4">
+                            <input type="text" class="form-control form-control-sm" id="postgresql-port" placeholder="Port" value="5432">
+                        </div>
+                        <div class="col-8">
+                            <input type="text" class="form-control form-control-sm" id="postgresql-database" placeholder="Database" value="university_inventory">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <input type="text" class="form-control form-control-sm" id="postgresql-user" placeholder="Username" value="postgres">
+                        </div>
+                        <div class="col-6">
+                            <input type="password" class="form-control form-control-sm" id="postgresql-password" placeholder="Password" value="ynOhGf5T8QCETzdAqFJybWdS3n36gDSq">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-3 text-center">
+                <button class="btn btn-primary btn-lg me-3" onclick="connectDatabases()">
+                    <i class="fas fa-link me-1"></i>Connect to Databases
+                </button>
+                <span id="connection-status" class="text-danger">
+                    <i class="fas fa-times-circle me-1"></i>Not Connected
+                </span>
+            </div>
+        </div>
+
+        <!-- Main Content (hidden until connected) -->
+        <div id="main-content" style="display: none;">
+            
+            <!-- Table Selection -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4>Source Tables</h4>
+                    <select class="form-select" id="source-table-select" onchange="loadSourceTable()">
+                        <option value="">Select a table...</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <h4>Target Tables</h4>
+                    <select class="form-select" id="target-table-select" onchange="loadTargetTable()">
+                        <option value="">Select a table...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Column Mapping Section -->
+            <div id="column-mapping-section" style="display: none;">
+                <h4><i class="fas fa-arrows-alt-h me-2"></i>Column Mapping & Transformations</h4>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-database me-1 text-success"></i>Source Columns</h5>
+                        <div id="source-columns" class="border p-3 bg-light" style="min-height: 300px;">
+                            Select a source table to see columns
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-exchange-alt me-1 text-info"></i>Column Mappings</h5>
+                        <div class="text-center mb-3">
+                            <button class="btn btn-success btn-sm mb-2" onclick="autoMapColumns()">
+                                <i class="fas fa-magic me-1"></i>Auto Map
+                            </button>
+                            <button class="btn btn-warning btn-sm mb-2 ms-2" onclick="clearMappings()">
+                                <i class="fas fa-trash me-1"></i>Clear All
+                            </button>
+                        </div>
+                        <div id="column-mappings-display" class="border p-3 bg-white" style="min-height: 250px;">
+                            <div class="text-muted text-center">
+                                <i class="fas fa-arrow-right fa-2x mb-2"></i>
+                                <br>Drag source columns to target columns to create mappings
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-table me-1 text-warning"></i>Target Columns</h5>
+                        <div id="target-columns" class="border p-3 bg-light" style="min-height: 300px;">
+                            Select a target table to see columns
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transformation Panel -->
+                <div id="transformation-panel" class="transformation-panel mt-3" style="display: none;">
+                    <h5><i class="fas fa-cogs me-2"></i>Column Transformation</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Transformation Type:</label>
+                            <select class="form-select" id="transformation-type" onchange="updateTransformationParams()">
+                                <option value="identity">No transformation</option>
+                                <option value="uppercase">Uppercase</option>
+                                <option value="lowercase">Lowercase</option>
+                                <option value="trim">Trim whitespace</option>
+                                <option value="concat">Concatenate columns</option>
+                                <option value="date_format">Date format</option>
+                                <option value="round">Round numbers</option>
+                                <option value="map_values">Map values</option>
+                                <option value="generate_uuid">Generate UUID</option>
+                                <option value="generate_sequence">Generate sequence</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="transformation-params">
+                                <!-- Dynamic parameters based on transformation type -->
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Test Value:</label>
+                            <input type="text" class="form-control" id="test-value" placeholder="Enter test value">
+                            <button class="btn btn-sm btn-info mt-1" onclick="testTransformation()">
+                                <i class="fas fa-play me-1"></i>Test
+                            </button>
+                            <div id="test-result" class="preview-value mt-2" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentSourceTable = null;
+        let currentTargetTable = null;
+        let currentSourceSchema = null;
+        let currentTargetSchema = null;
+        let columnMappings = {};
+        let transformations = {};
+        let currentData = [];
+        let editMode = false;
+        let isConnected = false;
+
+        async function connectDatabases() {
+            const button = document.querySelector('.btn-primary');
+            const statusEl = document.getElementById('connection-status');
+            
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Connecting...';
+            
+            const mariadbConfig = {
+                host: document.getElementById('mariadb-host').value,
+                port: document.getElementById('mariadb-port').value,
+                database: document.getElementById('mariadb-database').value,
+                user: document.getElementById('mariadb-user').value,
+                password: document.getElementById('mariadb-password').value
+            };
+            
+            const postgresqlConfig = {
+                host: document.getElementById('postgresql-host').value,
+                port: document.getElementById('postgresql-port').value,
+                database: document.getElementById('postgresql-database').value,
+                user: document.getElementById('postgresql-user').value,
+                password: document.getElementById('postgresql-password').value
+            };
+            
+            try {
+                const response = await fetch('/api/connect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mariadb: mariadbConfig,
+                        postgresql: postgresqlConfig
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusEl.innerHTML = '<i class="fas fa-check-circle me-1"></i>Connected Successfully';
+                    statusEl.className = 'text-success';
+                    
+                    // Populate table selects
+                    populateTableSelect('source-table-select', result.source_tables);
+                    populateTableSelect('target-table-select', result.target_tables);
+                    
+                    // Store available transformations
+                    transformations = result.transformations;
+                    
+                    // Show main content
+                    document.getElementById('main-content').style.display = 'block';
+                    isConnected = true;
+                    
+                } else {
+                    throw new Error(result.error || 'Connection failed');
+                }
+                
+            } catch (error) {
+                statusEl.innerHTML = `<i class="fas fa-times-circle me-1"></i>Connection Failed: ${error.message}`;
+                statusEl.className = 'text-danger';
+            }
+            
+            button.disabled = false;
+            button.innerHTML = '<i class="fas fa-link me-1"></i>Connect to Databases';
+        }
+
+        function populateTableSelect(selectId, tables) {
+            const select = document.getElementById(selectId);
+            select.innerHTML = '<option value="">Select a table...</option>';
+            
+            tables.forEach(table => {
+                const option = document.createElement('option');
+                option.value = table;
+                option.textContent = table;
+                select.appendChild(option);
+            });
+        }
+
+        async function loadSourceTable() {
+            const tableName = document.getElementById('source-table-select').value;
+            if (!tableName) return;
+            
+            currentSourceTable = tableName;
+            await loadTableSchema('source', tableName, 'source-columns');
+            updateMappingDisplay();
+        }
+
+        async function loadTargetTable() {
+            const tableName = document.getElementById('target-table-select').value;
+            if (!tableName) return;
+            
+            currentTargetTable = tableName;
+            await loadTableSchema('target', tableName, 'target-columns');
+            updateMappingDisplay();
+        }
+
+        async function loadTableSchema(dbType, tableName, containerId) {
+            try {
+                const response = await fetch(`/api/schema/${dbType}/${tableName}`);
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                
+                if (dbType === 'source') {
+                    currentSourceSchema = result.schema;
+                } else {
+                    currentTargetSchema = result.schema;
+                }
+                
+                displayColumns(result.schema, containerId, dbType);
+                
+            } catch (error) {
+                document.getElementById(containerId).innerHTML = `<div class="text-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        function displayColumns(schema, containerId, dbType) {
+            const container = document.getElementById(containerId);
+            
+            if (!schema || !schema.columns) {
+                container.innerHTML = '<div class="text-muted">No columns found</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            schema.columns.forEach(column => {
+                const isSource = dbType === 'source';
+                const isMapped = isColumnMapped(dbType, column.column_name);
+                
+                html += `
+                    <div class="column-item ${isSource ? 'source-column' : 'target-column'} ${isMapped ? 'mapped' : ''}"
+                         draggable="${isSource}"
+                         ondragstart="${isSource ? `dragStart(event, '${dbType}', '${column.column_name}')` : ''}"
+                         ${!isSource ? `ondrop="dropColumn(event, '${column.column_name}')" ondragover="allowDrop(event)"` : ''}
+                         onclick="selectColumn('${dbType}', '${column.column_name}')">
+                        <div class="fw-bold">${column.column_name}</div>
+                        <div class="column-type">${column.data_type}${column.character_maximum_length ? `(${column.character_maximum_length})` : ''}</div>
+                        ${column.is_nullable === 'NO' ? '<small class="text-danger">NOT NULL</small>' : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function isColumnMapped(dbType, columnName) {
+            const tableName = dbType === 'source' ? currentSourceTable : currentTargetTable;
+            if (!tableName) return false;
+            
+            for (const mappingKey in columnMappings) {
+                const mapping = columnMappings[mappingKey];
+                if (dbType === 'source' && mapping.sourceTable === tableName && mapping.sourceColumn === columnName) {
+                    return true;
+                }
+                if (dbType === 'target' && mapping.targetTable === tableName && mapping.targetColumn === columnName) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Enhanced drag and drop functions
+        function dragStart(event, dbType, columnName) {
+            event.dataTransfer.setData("text/plain", JSON.stringify({dbType, columnName}));
+            event.target.classList.add('dragging');
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('drag-over');
+        }
+
+        function dropColumn(event, targetColumnName) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            
+            const dragData = JSON.parse(event.dataTransfer.getData("text/plain"));
+            
+            // Create mapping
+            if (dragData.dbType === 'source' && targetColumnName) {
+                createColumnMapping(dragData.columnName, targetColumnName);
+            }
+            
+            // Remove dragging class
+            document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+        }
+
+        function createColumnMapping(sourceColumn, targetColumn) {
+            if (!currentSourceTable || !currentTargetTable) {
+                alert('Please select both source and target tables');
+                return;
+            }
+
+            const mappingKey = `${currentSourceTable}.${sourceColumn}->${currentTargetTable}.${targetColumn}`;
+            columnMappings[mappingKey] = {
+                sourceTable: currentSourceTable,
+                sourceColumn: sourceColumn,
+                targetTable: currentTargetTable,
+                targetColumn: targetColumn,
+                transformation: 'identity'
+            };
+
+            updateMappingDisplay();
+            
+            // Refresh column displays to show mapped status
+            if (currentSourceSchema) {
+                displayColumns(currentSourceSchema, 'source-columns', 'source');
+            }
+            if (currentTargetSchema) {
+                displayColumns(currentTargetSchema, 'target-columns', 'target');
+            }
+        }
+
+        function updateMappingDisplay() {
+            const container = document.getElementById('column-mappings-display');
+            
+            if (!currentSourceTable || !currentTargetTable) {
+                container.innerHTML = `
+                    <div class="text-muted text-center">
+                        <i class="fas fa-arrow-right fa-2x mb-2"></i>
+                        <br>Select both source and target tables to see mappings
+                    </div>
+                `;
+                document.getElementById('column-mapping-section').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('column-mapping-section').style.display = 'block';
+            
+            const mappings = Object.entries(columnMappings).filter(([key, mapping]) => 
+                mapping.sourceTable === currentSourceTable && mapping.targetTable === currentTargetTable
+            );
+            
+            if (mappings.length === 0) {
+                container.innerHTML = `
+                    <div class="text-muted text-center">
+                        <i class="fas fa-arrow-right fa-2x mb-2"></i>
+                        <br>Drag source columns to target columns to create mappings
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            mappings.forEach(([key, mapping]) => {
+                html += `
+                    <div class="mapping-line">
+                        <strong>${mapping.sourceColumn}</strong> → <strong>${mapping.targetColumn}</strong>
+                        <span class="remove-mapping" onclick="removeMapping('${key}')" title="Remove mapping">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <br>
+                        <small class="text-light">Transform: ${mapping.transformation}</small>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function removeMapping(mappingKey) {
+            delete columnMappings[mappingKey];
+            updateMappingDisplay();
+            
+            // Refresh column displays
+            if (currentSourceSchema) {
+                displayColumns(currentSourceSchema, 'source-columns', 'source');
+            }
+            if (currentTargetSchema) {
+                displayColumns(currentTargetSchema, 'target-columns', 'target');
+            }
+        }
+
+        // Enhanced Auto mapping function
+        async function autoMapColumns() {
+            if (!currentSourceTable || !currentTargetTable) {
+                alert('Please select both source and target tables first');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/auto-map-columns', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        source_table: currentSourceTable,
+                        target_table: currentTargetTable
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                // Update local mappings
+                result.mappings.forEach(mapping => {
+                    columnMappings[mapping.mapping_key] = {
+                        sourceTable: currentSourceTable,
+                        sourceColumn: mapping.source_column,
+                        targetTable: currentTargetTable,
+                        targetColumn: mapping.target_column,
+                        transformation: 'identity'
+                    };
+                });
+
+                updateMappingDisplay();
+                
+                // Refresh column displays
+                if (currentSourceSchema) {
+                    displayColumns(currentSourceSchema, 'source-columns', 'source');
+                }
+                if (currentTargetSchema) {
+                    displayColumns(currentTargetSchema, 'target-columns', 'target');
+                }
+
+                // Show result
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'auto-map-result';
+                resultDiv.innerHTML = `
+                    <strong>Auto-mapping completed!</strong><br>
+                    Successfully mapped ${result.total_mapped} columns.
+                    <button class="btn btn-sm btn-outline-secondary float-end" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                const container = document.getElementById('column-mappings-display');
+                container.insertBefore(resultDiv, container.firstChild);
+
+            } catch (error) {
+                alert(`Auto-mapping failed: ${error.message}`);
+            }
+        }
+
+        function clearMappings() {
+            if (!currentSourceTable || !currentTargetTable) return;
+            
+            // Remove mappings for current table pair
+            const keysToRemove = Object.keys(columnMappings).filter(key => {
+                const mapping = columnMappings[key];
+                return mapping.sourceTable === currentSourceTable && mapping.targetTable === currentTargetTable;
+            });
+            
+            keysToRemove.forEach(key => delete columnMappings[key]);
+            
+            updateMappingDisplay();
+            
+            // Refresh column displays
+            if (currentSourceSchema) {
+                displayColumns(currentSourceSchema, 'source-columns', 'source');
+            }
+            if (currentTargetSchema) {
+                displayColumns(currentTargetSchema, 'target-columns', 'target');
+            }
+        }
+
+        // Transformation functions  
+        function selectColumn(dbType, columnName) {
+            if (dbType === 'target') {
+                document.getElementById('transformation-panel').style.display = 'block';
+                // Set up transformation panel for this column
+            }
+        }
+        
+        function updateTransformationParams() {
+            const transformationType = document.getElementById('transformation-type').value;
+            const paramsContainer = document.getElementById('transformation-params');
+            
+            // Clear previous params
+            paramsContainer.innerHTML = '';
+            
+            if (transformations[transformationType] && transformations[transformationType].params.length > 0) {
+                transformations[transformationType].params.forEach(param => {
+                    const div = document.createElement('div');
+                    div.className = 'mb-2';
+                    div.innerHTML = `
+                        <label>${param}:</label>
+                        <input type="text" class="form-control" name="${param}" placeholder="Enter ${param}">
+                    `;
+                    paramsContainer.appendChild(div);
+                });
+            }
+        }
+        
+        async function testTransformation() {
+            const transformationType = document.getElementById('transformation-type').value;
+            const testValue = document.getElementById('test-value').value;
+            
+            if (!testValue) {
+                alert('Please enter a test value');
+                return;
+            }
+            
+            const params = {};
+            const paramInputs = document.querySelectorAll('#transformation-params input');
+            paramInputs.forEach(input => {
+                params[input.name] = input.value;
+            });
+            
+            try {
+                const response = await fetch('/api/validate-transformation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        transformation: transformationType,
+                        params: params,
+                        test_value: testValue
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                
+                document.getElementById('test-result').innerHTML = `Result: ${result.result}`;
+                document.getElementById('test-result').style.display = 'block';
+                
+            } catch (error) {
+                document.getElementById('test-result').innerHTML = `Error: ${error.message}`;
+                document.getElementById('test-result').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

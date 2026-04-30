@@ -1,0 +1,2393 @@
+import { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
+import NotesIndicator from "@/components/NotesIndicator";
+import { ChevronDown, ChevronUp, TrendingUp, Plus, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import * as XLSX from "xlsx";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
+interface SaleData {
+  id: number;
+  saleId: string;
+  chargeCode: string;
+  total: number;
+  totalAmount: string;
+  isPaid: boolean;
+  createdAt: string;
+  processedBy: {
+    firstName: string;
+    lastName: string;
+  };
+  items: {
+    name: string;
+    quantity: number;
+    price: number;
+  }[];
+}
+
+interface SalesFilters {
+  chargeCode: string;
+  itemSearch: string;
+  startDate: string;
+  endDate: string;
+  timePeriod: string; // "custom", "week", "month", "quarter", "year"
+  showUnpaidOnly: boolean;
+  page: number;
+  limit: number;
+}
+
+interface SalesReportData {
+  data: {
+    summary: {
+      totalSales: number;
+      totalAmount: number;
+      uniqueChargeCodes: number;
+    };
+    departmentSummary: Array<{
+      department: string;
+      totalSales: number;
+      totalAmount: number;
+    }>;
+    sales: Array<{
+      id: number;
+      saleId: string;
+      chargeCode: string;
+      total: number;
+      totalAmount: string;
+      isPaid: boolean;
+      createdAt: string;
+      processedBy: {
+        firstName: string;
+        lastName: string;
+      };
+      items: Array<{
+        name: string;
+        quantity: number;
+        price: number;
+      }>;
+    }>;
+    pagination: {
+      page: number;
+      totalPages: number;
+    };
+  };
+}
+
+interface DashboardStats {
+  totalItems: number;
+  totalValue: number;
+  totalValueExVAT: number;
+  totalUnits: number;
+  lowStockItems: number;
+  activeUsers: number;
+}
+
+interface CategoryStat {
+  category: {
+    id: number;
+    name: string;
+    icon: string;
+    color: string;
+  };
+  itemCount: number;
+  totalValue: number;
+}
+
+interface LowStockItem {
+  id: number;
+  name: string;
+  sku?: string;
+  currentStock: number;
+  minimumStock: number;
+  category: {
+    name: string;
+  };
+}
+
+interface StockMovement {
+  id: number;
+  item: {
+    name: string;
+  };
+  type: string;
+  quantity: number;
+  reason: string;
+  createdAt: string;
+  newStock?: number;
+}
+
+interface ExpiringChargeCode {
+  code: string;
+  title: string;
+  validUntil: string;
+  authorisedBy: string;
+  costCentre?: string;
+}
+
+interface MostSoldItem {
+  itemId: number;
+  name: string;
+  sku: string;
+  totalQuantity: number;
+  totalRevenue: number;
+  salesCount: number;
+  averagePrice: number;
+}
+
+interface MostSoldItemsData {
+  data: {
+    items: MostSoldItem[];
+    summary: {
+      totalItemsSold: number;
+      totalRevenue: number;
+      uniqueItems: number;
+    };
+  };
+}
+
+export default function Reports() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<'sales' | 'inventory'>('sales');
+  const [expandedChargeCodes, setExpandedChargeCodes] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<'charge-code' | 'item'>('charge-code');
+  const [topK, setTopK] = useState<number>(10);
+  const [itemSearch, setItemSearch] = useState<string>('');
+  const [selectedSales, setSelectedSales] = useState<Set<number>>(new Set());
+  const [salesFilters, setSalesFilters] = useState<SalesFilters>({
+    chargeCode: "",
+    itemSearch: "",
+    startDate: "",
+    endDate: "",
+    timePeriod: "custom",
+    showUnpaidOnly: false,
+    page: 1,
+    limit: 100 // Increased to show more data for grouping
+  });
+  const [skuFilter, setSkuFilter] = useState<string>('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [expandedSales, setExpandedSales] = useState<Set<number>>(new Set());
+  const [showMostSoldItems, setShowMostSoldItems] = useState(false);
+  
+  // Adjustment dialog state
+  const [showAdjustmentDialog, setShowAdjustmentDialog] = useState(false);
+  const [adjustmentChargeCode, setAdjustmentChargeCode] = useState("");
+  const [adjustmentAmount, setAdjustmentAmount] = useState("");
+  const [adjustmentReason, setAdjustmentReason] = useState("");
+  const [adjustmentDate, setAdjustmentDate] = useState<Date>(new Date());
+
+  const { data: stats } = useQuery<DashboardStats>({
+    queryKey: ["/api/dashboard/stats"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/dashboard/stats");
+      return await response.json();
+    },
+  });
+
+  const { data: categoryStats } = useQuery<CategoryStat[]>({
+    queryKey: ["/api/dashboard/category-stats"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/dashboard/category-stats");
+      return await response.json();
+    },
+  });
+
+  const { data: lowStockItems } = useQuery<LowStockItem[]>({
+    queryKey: ["/api/dashboard/low-stock"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/dashboard/low-stock");
+      return await response.json();
+    },
+  });
+
+  const { data: stockMovements } = useQuery<StockMovement[]>({
+    queryKey: ["/api/stock-movements", { limit: 20 }],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/stock-movements");
+      return await response.json();
+    },
+  });
+
+  // Expiring charge codes query (3 months = 90 days)
+  const { data: expiringChargeCodes } = useQuery<ExpiringChargeCode[]>({
+    queryKey: ["/api/chargecodes/expiring"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/chargecodes/expiring?days=90");
+      return await response.json();
+    },
+  });
+
+  // Sales report query
+  const { data: salesReport, isLoading: salesLoading, refetch: refetchSales } = useQuery<SalesReportData>({
+    queryKey: ["/api/sales/reports", salesFilters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (salesFilters.chargeCode) params.append("chargeCode", salesFilters.chargeCode);
+      if (salesFilters.startDate) params.append("startDate", salesFilters.startDate);
+      if (salesFilters.endDate) params.append("endDate", salesFilters.endDate);
+      if (salesFilters.showUnpaidOnly) params.append("unpaidOnly", "true");
+      params.append("page", salesFilters.page.toString());
+      params.append("limit", salesFilters.limit.toString());
+
+      const response = await apiRequest("GET", `/api/sales/reports?${params.toString()}`);
+      return await response.json();
+    },
+  });
+
+  // Most sold items query
+  const { data: mostSoldItemsData, isLoading: mostSoldItemsLoading } = useQuery<MostSoldItemsData>({
+    queryKey: ["/api/sales/analytics/most-sold-items", salesFilters.startDate, salesFilters.endDate, salesFilters.chargeCode],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (salesFilters.chargeCode) params.append("chargeCode", salesFilters.chargeCode);
+      if (salesFilters.startDate) params.append("startDate", salesFilters.startDate);
+      if (salesFilters.endDate) params.append("endDate", salesFilters.endDate);
+      params.append("limit", "20");
+
+      const response = await apiRequest("GET", `/api/sales/analytics/most-sold-items?${params.toString()}`);
+      return await response.json();
+    },
+    enabled: showMostSoldItems,
+  });
+
+  // Mark sale as paid mutation
+  const markAsPaidMutation = useMutation({
+    mutationFn: async (saleId: number) => {
+      return apiRequest('PATCH', `/api/sales/${saleId}/paid`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Sale marked as paid successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/sales/reports"] });
+      refetchSales();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to mark sale as paid.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mark sale as unpaid mutation
+  const markAsUnpaidMutation = useMutation({
+    mutationFn: async (saleId: number) => {
+      return apiRequest('PATCH', `/api/sales/${saleId}/unpaid`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Sale marked as unpaid successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/sales/reports"] });
+      refetchSales();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to mark sale as unpaid.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Bulk mark as paid mutation
+  const bulkMarkAsPaidMutation = useMutation({
+    mutationFn: async (saleIds: number[]) => {
+      const results = await Promise.allSettled(
+        saleIds.map(saleId =>
+          apiRequest('PATCH', `/api/sales/${saleId}/paid`)
+        )
+      );
+      return results;
+    },
+    onSuccess: (results) => {
+      const successful = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+      
+      toast({
+        title: "Bulk Update Complete",
+        description: `${successful} sales marked as paid${failed > 0 ? `, ${failed} failed` : ''}.`,
+        variant: failed > 0 ? "destructive" : "default",
+      });
+      
+      setSelectedSales(new Set());
+      queryClient.invalidateQueries({ queryKey: ["/api/sales/reports"] });
+      refetchSales();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to mark sales as paid.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Helper functions for bulk selection
+  const toggleSaleSelection = (saleId: number) => {
+    setSelectedSales(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(saleId)) {
+        newSet.delete(saleId);
+      } else {
+        newSet.add(saleId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = (salesToToggle: number[]) => {
+    setSelectedSales(prev => {
+      const newSet = new Set(prev);
+      const allSelected = salesToToggle.every(id => newSet.has(id));
+      
+      if (allSelected) {
+        salesToToggle.forEach(id => newSet.delete(id));
+      } else {
+        salesToToggle.forEach(id => newSet.add(id));
+      }
+      return newSet;
+    });
+  };
+
+  // Handle creating an adjustment/refund
+  const handleCreateAdjustment = async () => {
+    if (!adjustmentChargeCode.trim()) {
+      toast({
+        title: "Charge code required",
+        description: "Please enter a charge code",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const amount = parseFloat(adjustmentAmount);
+    if (isNaN(amount) || amount === 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid non-zero amount",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      // Fetch MISC item
+      const miscItemResponse = await apiRequest("GET", "/api/items?sku=MISC");
+      const miscItemData = await miscItemResponse.json();
+      
+      if (!miscItemData?.items?.[0]) {
+        throw new Error("MISC item not found. Please contact administrator.");
+      }
+      
+      const misc = miscItemData.items[0];
+      
+      // Create sale with MISC item at custom price
+      // Positive amount = refund (negative price), Negative amount = charge (positive price)
+      const unitPrice = Math.abs(amount) * (amount > 0 ? -1 : 1);
+      
+      await apiRequest("POST", "/api/sales", {
+        chargeCode: adjustmentChargeCode.trim(),
+        customerNotes: `ADJUSTMENT: ${adjustmentReason || 'Manual adjustment'}`,
+        processDate: adjustmentDate.toISOString(),
+        items: [{
+          itemId: misc.id,
+          itemName: amount > 0 ? "Refund" : "Additional Charge",
+          itemSku: "MISC",
+          quantity: 1,
+          unitPrice: unitPrice
+        }]
+      });
+      
+      toast({
+        title: "Adjustment created",
+        description: `${amount > 0 ? 'Refund' : 'Charge'} of £${Math.abs(amount).toFixed(2)} recorded for ${adjustmentChargeCode}`
+      });
+      
+      setShowAdjustmentDialog(false);
+      setAdjustmentChargeCode("");
+      setAdjustmentAmount("");
+      setAdjustmentReason("");
+      setAdjustmentDate(new Date());
+      
+      // Refresh sales data
+      queryClient.invalidateQueries({ queryKey: ["/api/sales/reports"] });
+      refetchSales();
+    } catch (error) {
+      toast({
+        title: "Failed to create adjustment",
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Calculate date range based on time period
+  const getDateRangeFromPeriod = (period: string) => {
+    const now = new Date();
+    const startDate = new Date();
+
+    switch (period) {
+      case "today":
+        // Today only
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case "this_week":
+        // Start of current week (Monday)
+        const dayOfWeek = now.getDay();
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+        startDate.setDate(now.getDate() - daysToMonday);
+        startDate.setHours(0, 0, 0, 0);
+        break;
+      case "last_month":
+        // Start of previous month to end of previous month
+        startDate.setMonth(now.getMonth() - 1);
+        startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+        const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        return {
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: lastMonth.toISOString().split('T')[0]
+        };
+      case "last_quarter":
+        // Start of previous quarter
+        const currentQuarter = Math.floor(now.getMonth() / 3);
+        const lastQuarterStartMonth = (currentQuarter - 1) * 3;
+        if (lastQuarterStartMonth < 0) {
+          startDate.setFullYear(now.getFullYear() - 1);
+          startDate.setMonth(9); // October (start of Q4 previous year)
+        } else {
+          startDate.setMonth(lastQuarterStartMonth);
+        }
+        startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+        const quarterEnd = new Date(startDate);
+        quarterEnd.setMonth(quarterEnd.getMonth() + 3);
+        quarterEnd.setDate(0); // Last day of quarter
+        return {
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: quarterEnd.toISOString().split('T')[0]
+        };
+      default:
+        return { startDate: salesFilters.startDate, endDate: salesFilters.endDate };
+    }
+
+    // Set start date to beginning of day (00:00:00)
+    startDate.setHours(0, 0, 0, 0);
+    // Set end date to end of day (23:59:59)
+    now.setHours(23, 59, 59, 999);
+
+    return {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: now.toISOString().split('T')[0]
+    };
+  };
+
+  // Group sales by charge code
+  const groupedSales = useMemo(() => {
+    if (!salesReport?.data?.sales) return {};
+
+    const groups: Record<string, typeof salesReport.data.sales> = {};
+    salesReport.data.sales.forEach((sale) => {
+      if (!groups[sale.chargeCode]) {
+        groups[sale.chargeCode] = [];
+      }
+      groups[sale.chargeCode].push(sale);
+    });
+
+    return groups;
+  }, [salesReport]);
+
+  // Calculate top items by value
+  const topItemsByValue = useMemo(() => {
+    if (!salesReport?.data?.sales) return [];
+
+    const itemTotals: Record<string, { name: string; value: number; quantity: number }> = {};
+
+    salesReport.data.sales.forEach((sale) => {
+      sale.items.forEach((item: any) => {
+        // Map backend fields to frontend format
+        const itemName = item.itemName || item.name || 'Unknown Item';
+        const itemSku = item.itemSku || item.sku || '';
+        const itemPrice = parseFloat(item.unitPrice || item.price || '0');
+        const itemQuantity = parseFloat(item.quantity || '0');
+
+        // Apply SKU filter if set
+        if (skuFilter && !itemSku.toLowerCase().includes(skuFilter.toLowerCase())) {
+          return;
+        }
+
+        const key = itemName;
+        if (!itemTotals[key]) {
+          itemTotals[key] = { name: itemName, value: 0, quantity: 0 };
+        }
+        itemTotals[key].value += itemPrice * itemQuantity;
+        itemTotals[key].quantity += itemQuantity;
+      });
+    });
+
+    return Object.values(itemTotals)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, topK);
+  }, [salesReport, topK, skuFilter]);
+
+  // Calculate top items by quantity
+  const topItemsByQuantity = useMemo(() => {
+    if (!salesReport?.data?.sales) return [];
+
+    const itemTotals: Record<string, { name: string; value: number; quantity: number }> = {};
+
+    salesReport.data.sales.forEach((sale) => {
+      sale.items.forEach((item: any) => {
+        // Map backend fields to frontend format
+        const itemName = item.itemName || item.name || 'Unknown Item';
+        const itemSku = item.itemSku || item.sku || '';
+        const itemPrice = parseFloat(item.unitPrice || item.price || '0');
+        const itemQuantity = parseFloat(item.quantity || '0');
+
+        // Apply SKU filter if set
+        if (skuFilter && !itemSku.toLowerCase().includes(skuFilter.toLowerCase())) {
+          return;
+        }
+
+        const key = itemName;
+        if (!itemTotals[key]) {
+          itemTotals[key] = { name: itemName, value: 0, quantity: 0 };
+        }
+        itemTotals[key].value += itemPrice * itemQuantity;
+        itemTotals[key].quantity += itemQuantity;
+      });
+    });
+
+    return Object.values(itemTotals)
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, topK);
+  }, [salesReport, topK, skuFilter]);
+
+  // Calculate sales over time (by day)
+  const salesOverTime = useMemo(() => {
+    if (!salesReport?.data?.sales) return [];
+
+    const dailyTotals: Record<string, number> = {};
+
+    salesReport.data.sales.forEach((sale) => {
+      const date = new Date(sale.createdAt).toISOString().split('T')[0];
+      if (!dailyTotals[date]) {
+        dailyTotals[date] = 0;
+      }
+      dailyTotals[date] += parseFloat(sale.totalAmount);
+    });
+
+    return Object.entries(dailyTotals)
+      .map(([date, total]) => ({ date, total }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [salesReport]);
+
+  // Payment Status Data for Pie Chart
+  const paymentStatusData = useMemo(() => {
+    if (!salesReport?.data?.sales) return [];
+
+    const paidCount = salesReport.data.sales.filter((s: any) => s.isPaid).length;
+    const unpaidCount = salesReport.data.sales.filter((s: any) => !s.isPaid).length;
+    
+    const paidAmount = salesReport.data.sales
+      .filter((s: any) => s.isPaid)
+      .reduce((sum: number, s: any) => sum + parseFloat(s.totalAmount), 0);
+    
+    const unpaidAmount = salesReport.data.sales
+      .filter((s: any) => !s.isPaid)
+      .reduce((sum: number, s: any) => sum + parseFloat(s.totalAmount), 0);
+
+    return [
+      { name: 'Paid', value: paidAmount, count: paidCount, fill: '#10b981' },
+      { name: 'Unpaid', value: unpaidAmount, count: unpaidCount, fill: '#ef4444' }
+    ];
+  }, [salesReport]);
+
+  // Top Items by Revenue Data for Bar Chart
+  const topItemsChartData = useMemo(() => {
+    return topItemsByValue.slice(0, 10).map(item => {
+      const itemName = item.name || 'Unknown Item';
+      return {
+        name: itemName.length > 20 ? itemName.substring(0, 17) + '...' : itemName,
+        value: parseFloat(item.value.toFixed(2)),
+        fullName: itemName
+      };
+    });
+  }, [topItemsByValue]);
+
+  // Aggregate items by charge code with VAT information
+  const itemsByChargeCode = useMemo(() => {
+    if (!salesReport?.data?.sales) return {};
+
+    const aggregated: Record<string, Record<string, {
+      name: string;
+      sku: string;
+      quantity: number;
+      subtotal: number;
+      vatAmount: number;
+      totalWithVat: number;
+      price: number;
+      vatRate: number;
+    }>> = {};
+
+    salesReport.data.sales.forEach((sale) => {
+      if (!aggregated[sale.chargeCode]) {
+        aggregated[sale.chargeCode] = {};
+      }
+
+      sale.items.forEach((item: any) => {
+        // Map backend fields to frontend format
+        const itemName = item.itemName || item.name || 'Unknown Item';
+        const itemSku = item.itemSku || item.sku || 'N/A';
+        const itemPrice = parseFloat(item.unitPrice || item.price || '0');
+        const itemQuantity = parseFloat(item.quantity || '0');
+        const itemSubtotal = parseFloat(item.subtotal || (itemQuantity * itemPrice).toString());
+        const itemVatAmount = parseFloat(item.vatAmount || '0');
+        const itemTotalWithVat = parseFloat(item.totalWithVat || itemSubtotal.toString());
+        const itemVatRate = parseFloat(item.vatRate || '0');
+
+        if (!aggregated[sale.chargeCode][itemName]) {
+          aggregated[sale.chargeCode][itemName] = {
+            name: itemName,
+            sku: itemSku,
+            quantity: 0,
+            subtotal: 0,
+            vatAmount: 0,
+            totalWithVat: 0,
+            price: itemPrice,
+            vatRate: itemVatRate
+          };
+        }
+        aggregated[sale.chargeCode][itemName].quantity += itemQuantity;
+        aggregated[sale.chargeCode][itemName].subtotal += itemSubtotal;
+        aggregated[sale.chargeCode][itemName].vatAmount += itemVatAmount;
+        aggregated[sale.chargeCode][itemName].totalWithVat += itemTotalWithVat;
+      });
+    });
+
+    return aggregated;
+  }, [salesReport]);
+
+  // Per-item analysis with search filter
+  const itemAnalysis = useMemo(() => {
+    if (!salesReport?.data?.sales) return [];
+
+    const itemData: Record<string, {
+      name: string;
+      totalQuantity: number;
+      totalValue: number;
+      orderCount: number;
+      avgPrice: number;
+      salesByDate: Record<string, number>;
+      chargeCodes: Set<string>;
+    }> = {};
+
+    salesReport.data.sales.forEach((sale) => {
+      sale.items.forEach((item: any) => {
+        // Map backend fields to frontend format
+        const itemName = item.itemName || item.name || 'Unknown Item';
+        const itemPrice = parseFloat(item.unitPrice || item.price || '0');
+        const itemQuantity = parseFloat(item.quantity || '0');
+        
+        if (!itemData[itemName]) {
+          itemData[itemName] = {
+            name: itemName,
+            totalQuantity: 0,
+            totalValue: 0,
+            orderCount: 0,
+            avgPrice: 0,
+            salesByDate: {},
+            chargeCodes: new Set()
+          };
+        }
+
+        const date = new Date(sale.createdAt).toISOString().split('T')[0];
+        itemData[itemName].totalQuantity += itemQuantity;
+        itemData[itemName].totalValue += itemQuantity * itemPrice;
+        itemData[itemName].orderCount += 1;
+        itemData[itemName].chargeCodes.add(sale.chargeCode);
+
+        if (!itemData[itemName].salesByDate[date]) {
+          itemData[itemName].salesByDate[date] = 0;
+        }
+        itemData[itemName].salesByDate[date] += itemQuantity;
+      });
+    });
+
+    // Calculate average price and filter by search
+    const items = Object.values(itemData)
+      .map(item => ({
+        ...item,
+        avgPrice: item.totalValue / item.totalQuantity,
+        chargeCodesArray: Array.from(item.chargeCodes)
+      }))
+      .filter(item =>
+        !itemSearch || item.name.toLowerCase().includes(itemSearch.toLowerCase())
+      )
+      .sort((a, b) => b.totalValue - a.totalValue);
+
+    return items;
+  }, [salesReport, itemSearch]);
+
+  const toggleChargeCode = (code: string) => {
+    setExpandedChargeCodes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(code)) {
+        newSet.delete(code);
+      } else {
+        newSet.add(code);
+      }
+      return newSet;
+    });
+  };
+
+  const handleExport = async (type: string, format: 'csv' | 'xlsx' = 'csv') => {
+    if (type === "sales") {
+      const params = new URLSearchParams();
+      if (salesFilters.chargeCode) params.append("chargeCode", salesFilters.chargeCode);
+      if (salesFilters.startDate) params.append("startDate", salesFilters.startDate);
+      if (salesFilters.endDate) params.append("endDate", salesFilters.endDate);
+      if (salesFilters.showUnpaidOnly) params.append("unpaidOnly", "true");
+      params.append("format", "csv");
+
+      try {
+        const response = await apiRequest('GET', `/api/sales/reports?${params.toString()}`);
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `sales-report-${Date.now()}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }
+      } catch (error) {
+        console.error("Export failed:", error);
+      }
+      return;
+    }
+
+    if (type === "current-view") {
+      // Export the current filtered sales view based on view mode
+      if (salesReport?.data?.sales) {
+        let headers: string[];
+        let rows: any[][];
+
+        if (viewMode === 'charge-code') {
+          // Export by charge code with aggregated items, actual VAT rates, adjustments, and summary rows
+          headers = ['Charge Code', 'Item Name', 'Item SKU', 'Total Quantity', 'Avg Unit Price', 'VAT Rate', 'Total Value Ex VAT', 'Total Value Inc VAT', 'Notes/Reason'];
+          rows = [];
+
+          Object.entries(groupedSales).forEach(([chargeCode, sales]) => {
+            const aggregatedItems = itemsByChargeCode[chargeCode] || {};
+            const itemsArray = Object.values(aggregatedItems);
+
+            // Check if this charge code has any adjustments
+            const adjustments = sales.filter((sale: any) => {
+              const customerInfo = sale.customerInfo || {};
+              return customerInfo.notes?.startsWith('ADJUSTMENT:');
+            });
+
+            // Track row indices for this charge code (for Excel formulas)
+            const startRowIndex = rows.length + 2; // +2 for header row and 1-indexed
+
+            // Add item rows
+            itemsArray.forEach((item) => {
+              const avgPrice = item.quantity > 0 ? item.subtotal / item.quantity : 0;
+              const vatRatePercent = item.vatRate * 100; // Convert to percentage
+
+              rows.push([
+                chargeCode,
+                item.name,
+                item.sku || 'N/A',
+                item.quantity,
+                avgPrice, // Keep as number for Excel
+                `${vatRatePercent.toFixed(2)}%`,
+                item.subtotal, // Actual subtotal (Ex VAT)
+                item.totalWithVat, // Actual total with VAT
+                '' // No notes for regular items
+              ]);
+            });
+
+            // Add adjustment rows if any
+            adjustments.forEach((sale: any) => {
+              const customerInfo = sale.customerInfo || {};
+              const adjustmentNote = customerInfo.notes || '';
+              const adjustmentReason = adjustmentNote.replace('ADJUSTMENT:', '').trim();
+              const subtotal = parseFloat(sale.subtotalAmount || '0');
+              const vatAmount = parseFloat(sale.vatAmount || '0');
+              const total = parseFloat(sale.totalAmount || '0');
+              const vatRate = subtotal > 0 ? (vatAmount / subtotal) * 100 : 0;
+
+              rows.push([
+                chargeCode,
+                'ADJUSTMENT',
+                'ADJ',
+                1,
+                subtotal,
+                `${vatRate.toFixed(2)}%`,
+                subtotal,
+                total,
+                adjustmentReason
+              ]);
+            });
+
+            const endRowIndex = rows.length + 1; // Current row count + header
+
+            // Add summary row for this charge code
+            if (format === 'xlsx') {
+              // Use Excel formulas for XLSX
+              rows.push([
+                `${chargeCode} - TOTAL`,
+                '',
+                '',
+                { f: `SUM(D${startRowIndex}:D${endRowIndex})` }, // Sum quantities
+                '', // No avg for totals
+                '', // No VAT rate for totals
+                { f: `SUM(G${startRowIndex}:G${endRowIndex})` }, // Sum Ex VAT
+                { f: `SUM(H${startRowIndex}:H${endRowIndex})` }, // Sum Inc VAT
+                ''
+              ]);
+            } else {
+              // Calculate totals for CSV
+              const totalQty = itemsArray.reduce((sum, item) => sum + item.quantity, 0) + adjustments.length;
+              const totalExVAT = itemsArray.reduce((sum, item) => sum + item.subtotal, 0) +
+                                adjustments.reduce((sum: number, sale: any) => sum + parseFloat(sale.subtotalAmount || '0'), 0);
+              const totalIncVAT = itemsArray.reduce((sum, item) => sum + item.totalWithVat, 0) +
+                                 adjustments.reduce((sum: number, sale: any) => sum + parseFloat(sale.totalAmount || '0'), 0);
+
+              rows.push([
+                `${chargeCode} - TOTAL`,
+                '',
+                '',
+                totalQty,
+                '',
+                '',
+                totalExVAT,
+                totalIncVAT,
+                ''
+              ]);
+            }
+
+            // Add blank row between charge codes for readability
+            rows.push(['', '', '', '', '', '', '', '', '']);
+          });
+        } else {
+          // Export by item with statistics and actual VAT
+          headers = ['Item Name', 'Total Quantity', 'Total Value Ex VAT', 'Total Value Inc VAT', 'VAT Amount', 'Order Count', 'Avg Price', 'Charge Codes'];
+          rows = itemAnalysis.map((item) => {
+            // Note: itemAnalysis uses totalValue which we need to update to use actual VAT data
+            // For now, we'll use the existing structure but this could be enhanced
+            return [
+              item.name,
+              item.totalQuantity,
+              item.totalValue, // This should ideally be subtotal from actual data
+              item.totalValue, // This should ideally be totalWithVat from actual data
+              0, // VAT amount - would need to aggregate from actual sales
+              item.orderCount,
+              item.avgPrice,
+              item.chargeCodesArray.join('; ')
+            ];
+          });
+        }
+
+        if (format === 'xlsx') {
+          // Export as XLSX with proper formatting
+          const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+
+          // Format currency columns
+          const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+          for (let R = 1; R <= range.e.r; ++R) {
+            // Format price columns for charge-code view (E, G, H - Avg Unit Price, Ex VAT, Inc VAT)
+            if (viewMode === 'charge-code') {
+              ['E', 'G', 'H'].forEach(col => {
+                const cellAddress = `${col}${R + 1}`;
+                const cell = worksheet[cellAddress];
+                if (cell && typeof cell.v === 'number') {
+                  cell.z = '£#,##0.00';
+                }
+              });
+            } else {
+              // Format for item view (C, D, E, G columns)
+              ['C', 'D', 'E', 'G'].forEach(col => {
+                const cellAddress = `${col}${R + 1}`;
+                const cell = worksheet[cellAddress];
+                if (cell && typeof cell.v === 'number') {
+                  cell.z = '£#,##0.00';
+                }
+              });
+            }
+          }
+
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, viewMode === 'charge-code' ? 'By Charge Code' : 'By Item');
+          XLSX.writeFile(workbook, `sales-report-${viewMode}-${Date.now()}.xlsx`);
+        } else {
+          // Export as CSV with formatted currency
+          const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => {
+              if (typeof cell === 'number') {
+                return `"£${cell.toFixed(2)}"`;
+              }
+              return `"${cell}"`;
+            }).join(','))
+          ].join('\n');
+
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `sales-report-${viewMode}-${Date.now()}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }
+      }
+      return;
+    }
+
+    console.log(`Exporting ${type} data...`);
+  };
+
+  const handleSalesFilterChange = (field: string, value: string | boolean) => {
+    setSalesFilters(prev => ({
+      ...prev,
+      [field]: field === "showUnpaidOnly" ? value === "true" || value === true : value,
+      page: 1 // Reset to first page when filters change
+    }));
+  };
+
+  const clearSalesFilters = () => {
+    setSalesFilters({
+      chargeCode: "",
+      itemSearch: "",
+      startDate: "",
+      endDate: "",
+      timePeriod: "custom",
+      showUnpaidOnly: false,
+      page: 1,
+      limit: 100
+    });
+  };
+
+  const toggleSaleExpansion = (saleId: number) => {
+    setExpandedSales(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(saleId)) {
+        newSet.delete(saleId);
+      } else {
+        newSet.add(saleId);
+      }
+      return newSet;
+    });
+  };
+
+  // Filter sales based on item search
+  const filteredSales = salesReport?.data?.sales.filter(sale => {
+    if (!salesFilters.itemSearch) return true;
+    const searchLower = salesFilters.itemSearch.toLowerCase();
+    return sale.items.some(item =>
+      item.name.toLowerCase().includes(searchLower)
+    );
+  }) || [];
+
+  const handleMarkAsPaid = (saleId: number) => {
+    if (confirm('Are you sure you want to mark this sale as paid?')) {
+      markAsPaidMutation.mutate(saleId);
+    }
+  };
+
+  const handleMarkAsUnpaid = (saleId: number) => {
+    if (confirm('Are you sure you want to mark this sale as unpaid? This may be used for refunds or payment errors.')) {
+      markAsUnpaidMutation.mutate(saleId);
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold text-charcoal">Reports & Analytics</h1>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <i className="fas fa-download mr-2"></i>
+                Export Current View
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => handleExport("current-view", "csv")}>
+                <i className="fas fa-file-csv mr-2"></i>
+                Export to .csv
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport("current-view", "xlsx")}>
+                <i className="fas fa-file-excel mr-2"></i>
+                Export to .xlsx
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Global Filters */}
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+            <div>
+              <Label htmlFor="charge-code-filter">Charge Code</Label>
+              <Input
+                id="charge-code-filter"
+                placeholder="e.g., DEPT001"
+                value={salesFilters.chargeCode}
+                onChange={(e) => handleSalesFilterChange("chargeCode", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="sku-filter">SKU</Label>
+              <Input
+                id="sku-filter"
+                placeholder="Search by SKU..."
+                value={skuFilter}
+                onChange={(e) => setSkuFilter(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="category-filter">Category</Label>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger id="category-filter">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categoryStats?.map((cat) => (
+                    <SelectItem key={cat.category.id} value={cat.category.id.toString()}>
+                      {cat.category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="time-period-filter">Time Period</Label>
+              <Select
+                value={salesFilters.timePeriod}
+                onValueChange={(value) => {
+                  setSalesFilters(prev => ({ ...prev, timePeriod: value, page: 1 }));
+                  if (value !== "custom") {
+                    const { startDate, endDate } = getDateRangeFromPeriod(value);
+                    setSalesFilters(prev => ({ ...prev, startDate, endDate, page: 1 }));
+                  }
+                }}
+              >
+                <SelectTrigger id="time-period-filter">
+                  <SelectValue placeholder="Select period" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="today">Today</SelectItem>
+                  <SelectItem value="this_week">This Week</SelectItem>
+                  <SelectItem value="last_month">Last Month</SelectItem>
+                  <SelectItem value="last_quarter">Last Quarter</SelectItem>
+                  <SelectItem value="custom">Custom Dates</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="start-date-filter">Start Date</Label>
+              <Input
+                id="start-date-filter"
+                type="date"
+                value={salesFilters.startDate}
+                onChange={(e) => {
+                  handleSalesFilterChange("startDate", e.target.value);
+                  setSalesFilters(prev => ({ ...prev, timePeriod: "custom" }));
+                }}
+                disabled={salesFilters.timePeriod !== "custom"}
+              />
+            </div>
+            <div>
+              <Label htmlFor="end-date-filter">End Date</Label>
+              <Input
+                id="end-date-filter"
+                type="date"
+                value={salesFilters.endDate}
+                onChange={(e) => {
+                  handleSalesFilterChange("endDate", e.target.value);
+                  setSalesFilters(prev => ({ ...prev, timePeriod: "custom" }));
+                }}
+                disabled={salesFilters.timePeriod !== "custom"}
+              />
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="unpaid-only-filter"
+                checked={salesFilters.showUnpaidOnly}
+                onChange={(e) => handleSalesFilterChange("showUnpaidOnly", e.target.checked.toString())}
+                className="rounded border-gray-300"
+              />
+              <Label htmlFor="unpaid-only-filter" className="text-sm">
+                Show unpaid sales only
+              </Label>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={() => refetchSales()} disabled={salesLoading}>
+                {salesLoading ? (
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                ) : (
+                  <i className="fas fa-search mr-2"></i>
+                )}
+                Apply Filters
+              </Button>
+              <Button variant="outline" onClick={() => {
+                clearSalesFilters();
+                setSkuFilter('');
+                setCategoryFilter('all');
+              }}>
+                Clear All
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Tab Navigation */}
+      <div className="flex gap-2 mb-6 border-b">
+        <Button
+          variant={activeTab === 'sales' ? 'default' : 'ghost'}
+          className={`rounded-b-none ${activeTab === 'sales' ? 'border-b-2 border-university-blue' : ''}`}
+          onClick={() => setActiveTab('sales')}
+        >
+          <i className="fas fa-chart-line mr-2"></i>
+          Sales Analytics
+        </Button>
+        <Button
+          variant={activeTab === 'inventory' ? 'default' : 'ghost'}
+          className={`rounded-b-none ${activeTab === 'inventory' ? 'border-b-2 border-university-blue' : ''}`}
+          onClick={() => setActiveTab('inventory')}
+        >
+          <i className="fas fa-boxes mr-2"></i>
+          Inventory Analytics
+        </Button>
+      </div>
+
+      {/* Sales Analytics Tab */}
+      {activeTab === 'sales' && (
+        <>
+          {/* Sales Reports Section */}
+          <div className="mb-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center">
+                    <i className="fas fa-cash-register mr-2 text-university-blue"></i>
+                    Sales Reports
+                  </CardTitle>
+                  <Button
+                    onClick={() => setShowAdjustmentDialog(true)}
+                    className="ml-2"
+                    size="sm"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Adjustment
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Sales Summary */}
+            {salesReport?.data && (
+              <div className="mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="text-sm text-blue-600 font-medium">Total Sales</div>
+                    <div className="text-2xl font-bold text-blue-700">
+                      {salesReport.data.summary.totalSales}
+                    </div>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="text-sm text-green-600 font-medium">Total Amount</div>
+                    <div className="text-2xl font-bold text-green-700">
+                      £{salesReport.data.summary.totalAmount.toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <div className="text-sm text-purple-600 font-medium">Unique Charge Codes</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {salesReport.data.summary.uniqueChargeCodes}
+                    </div>
+                  </div>
+                  <div className="bg-orange-50 p-4 rounded-lg">
+                    <div className="text-sm text-orange-600 font-medium">Average Sale</div>
+                    <div className="text-2xl font-bold text-orange-700">
+                      £{salesReport.data.summary.totalSales > 0 ? 
+                        (salesReport.data.summary.totalAmount / salesReport.data.summary.totalSales).toFixed(2) : 
+                        '0.00'
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                  {/* Payment Status Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <i className="fas fa-money-bill-wave text-green-600"></i>
+                        Payment Status
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex justify-center">
+                      {paymentStatusData.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie
+                              data={paymentStatusData}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={({ name, payload }: any) => `${name}: ${payload.count}`}
+                              outerRadius={80}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {paymentStatusData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <Tooltip 
+                              formatter={(value: any) => `£${Number(value).toFixed(2)}`}
+                              labelFormatter={(label) => `${label}`}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <p className="text-gray-500">No payment data available</p>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Sales Trend Chart */}
+                  <Card className="lg:col-span-2">
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-blue-600" />
+                        Sales Trend
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {salesOverTime.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={250}>
+                          <LineChart data={salesOverTime}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis
+                              dataKey="date"
+                              tick={{ fontSize: 12 }}
+                              interval={Math.floor(salesOverTime.length / 5)}
+                              label={{ value: 'Date', position: 'insideBottom', offset: -5 }}
+                            />
+                            <YAxis
+                              tick={{ fontSize: 12 }}
+                              tickFormatter={(value) => {
+                                if (value >= 1000) {
+                                  return `£${(value / 1000).toFixed(1)}k`;
+                                }
+                                return `£${value.toFixed(0)}`;
+                              }}
+                              label={{ value: 'Sales Amount (£)', angle: -90, position: 'insideLeft' }}
+                            />
+                            <Tooltip
+                              formatter={(value: any) => `£${Number(value).toFixed(2)}`}
+                              labelFormatter={(label) => `Date: ${label}`}
+                            />
+                            <Legend />
+                            <Line
+                              type="monotone"
+                              dataKey="total"
+                              stroke="#3b82f6"
+                              dot={false}
+                              name="Daily Sales"
+                              strokeWidth={2}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <p className="text-gray-500">No sales trend data available</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Top Items Chart */}
+                <Card className="mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <i className="fas fa-star text-amber-500"></i>
+                      Top 10 Items by Revenue
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {topItemsChartData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={topItemsChartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis
+                            dataKey="name"
+                            tick={{ fontSize: 11 }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                            label={{ value: 'Item Name', position: 'insideBottom', offset: -10 }}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12 }}
+                            tickFormatter={(value) => {
+                              if (value >= 1000) {
+                                return `£${(value / 1000).toFixed(1)}k`;
+                              }
+                              return `£${value.toFixed(0)}`;
+                            }}
+                            label={{ value: 'Revenue (£)', angle: -90, position: 'insideLeft' }}
+                          />
+                          <Tooltip
+                            formatter={(value: any) => `£${Number(value).toFixed(2)}`}
+                            labelFormatter={(label) => {
+                              const item = topItemsChartData.find(i => i.name === label);
+                              return item ? item.fullName : label;
+                            }}
+                            contentStyle={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb' }}
+                          />
+                          <Bar dataKey="value" fill="#10b981" name="Revenue" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p className="text-gray-500">No item data available</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* View Mode Toggle */}
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Label className="text-base font-semibold">View By:</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={viewMode === 'charge-code' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setViewMode('charge-code')}
+                      >
+                        <i className="fas fa-credit-card mr-2"></i>
+                        Charge Code
+                      </Button>
+                      <Button
+                        variant={viewMode === 'item' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setViewMode('item')}
+                      >
+                        <i className="fas fa-box mr-2"></i>
+                        Item
+                      </Button>
+                    </div>
+                  </div>
+                  {viewMode === 'item' && (
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="item-search" className="text-sm">Search Items:</Label>
+                      <Input
+                        id="item-search"
+                        placeholder="Search by item name..."
+                        value={itemSearch}
+                        onChange={(e) => setItemSearch(e.target.value)}
+                        className="w-64"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Department Summary */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">Top Departments by Sales Volume</h3>
+                  <div className="space-y-2">
+                    {salesReport.data.departmentSummary.slice(0, 5).map((dept: SalesReportData['data']['departmentSummary'][0], index: number) => (
+                      <div key={dept.department} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                            index === 0 ? 'bg-yellow-500' : 
+                            index === 1 ? 'bg-gray-400' : 
+                            index === 2 ? 'bg-amber-600' : 'bg-blue-500'
+                          }`}>
+                            {index + 1}
+                          </div>
+                          <div>
+                            <div className="font-medium">{dept.department}</div>
+                            <div className="text-sm text-gray-500">{dept.totalSales} sales</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-semibold">£{dept.totalAmount.toLocaleString()}</div>
+                          <div className="text-sm text-gray-500">
+                            Avg: £{dept.totalSales > 0 ? (dept.totalAmount / dept.totalSales).toFixed(2) : '0.00'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sales by Charge Code OR Items View */}
+                <div>
+                  {viewMode === 'charge-code' ? (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">Sales by Charge Code</h3>
+                        {selectedSales.size > 0 && (
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-3">
+                            <span className="text-sm font-medium text-blue-700">
+                              {selectedSales.size} sale{selectedSales.size !== 1 ? 's' : ''} selected
+                            </span>
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => {
+                                const unPaidSales = Array.from(selectedSales).filter(id => {
+                                  const sale = Object.values(groupedSales)
+                                    .flat()
+                                    .find((s: any) => s.id === id);
+                                  return sale && !sale.isPaid;
+                                });
+                                if (unPaidSales.length > 0) {
+                                  bulkMarkAsPaidMutation.mutate(unPaidSales);
+                                }
+                              }}
+                              disabled={bulkMarkAsPaidMutation.isPending}
+                            >
+                              {bulkMarkAsPaidMutation.isPending ? (
+                                <i className="fas fa-spinner fa-spin mr-2"></i>
+                              ) : (
+                                <i className="fas fa-check mr-2"></i>
+                              )}
+                              Mark as Paid
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setSelectedSales(new Set())}
+                            >
+                              Clear Selection
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-3">
+                        {Object.entries(groupedSales).map(([chargeCode, sales]) => {
+                          const isExpanded = expandedChargeCodes.has(chargeCode);
+                          const totalAmount = sales.reduce((sum, sale) => sum + parseFloat(sale.totalAmount), 0);
+                          const aggregatedItems = itemsByChargeCode[chargeCode] || {};
+                          const totalUniqueItems = Object.keys(aggregatedItems).length;
+                          const chargeCodeUnpaidSales = (sales as any[]).filter(s => !s.isPaid).map((s: any) => s.id);
+                          const allChargeCodeSelected = chargeCodeUnpaidSales.length > 0 && chargeCodeUnpaidSales.every(id => selectedSales.has(id));
+
+                          return (
+                            <div key={chargeCode} className="border rounded-lg bg-white">
+                              {/* Charge Code Header */}
+                              <div
+                                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
+                                onClick={() => toggleChargeCode(chargeCode)}
+                              >
+                                <div className="flex items-center gap-3">
+                                  {chargeCodeUnpaidSales.length > 0 && (
+                                    <input
+                                      type="checkbox"
+                                      checked={allChargeCodeSelected}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        toggleSelectAll(chargeCodeUnpaidSales);
+                                      }}
+                                      className="w-5 h-5 rounded cursor-pointer"
+                                      title="Select all unpaid sales in this charge code"
+                                    />
+                                  )}
+                                  {isExpanded ? (
+                                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                                  ) : (
+                                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                                  )}
+                                  <div>
+                                    <div className="font-semibold text-lg">{chargeCode}</div>
+                                    <div className="text-sm text-gray-500">
+                                      {sales.length} order{sales.length !== 1 ? 's' : ''} • {totalUniqueItems} unique item{totalUniqueItems !== 1 ? 's' : ''}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="font-bold text-xl text-green-700">
+                                    £{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Expanded Content - Show Aggregated Items */}
+                              {isExpanded && (
+                                <div className="border-t bg-gray-50 p-4">
+                                  <div className="mb-4">
+                                    <h4 className="text-md font-semibold mb-2 text-university-blue">
+                                      <i className="fas fa-boxes mr-2"></i>
+                                      Items Ordered (Aggregated)
+                                    </h4>
+                                    <div className="bg-white border rounded-lg overflow-hidden">
+                                      <table className="w-full">
+                                        <thead className="bg-gray-100">
+                                          <tr>
+                                            <th className="text-left p-3 font-semibold text-sm">Item Name</th>
+                                            <th className="text-left p-3 font-semibold text-sm">SKU</th>
+                                            <th className="text-right p-3 font-semibold text-sm">Total Quantity</th>
+                                            <th className="text-right p-3 font-semibold text-sm">Avg Unit Price</th>
+                                            <th className="text-right p-3 font-semibold text-sm">Total Value</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {Object.values(aggregatedItems)
+                                            .sort((a, b) => b.totalValue - a.totalValue)
+                                            .map((item, idx) => {
+                                              const avgPrice = item.quantity > 0 ? item.totalValue / item.quantity : 0;
+                                              return (
+                                                <tr key={idx} className="border-t hover:bg-gray-50">
+                                                  <td className="p-3 text-gray-700">{item.name}</td>
+                                                  <td className="p-3 text-gray-600 text-sm">{item.sku}</td>
+                                                  <td className="p-3 text-right font-medium">{item.quantity.toFixed(2)}</td>
+                                                  <td className="p-3 text-right text-gray-600">
+                                                    £{avgPrice.toFixed(2)}
+                                                  </td>
+                                                  <td className="p-3 text-right font-semibold text-green-700">
+                                                    £{item.totalValue.toFixed(2)}
+                                                  </td>
+                                                </tr>
+                                              );
+                                            })}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+
+                                  <h4 className="text-md font-semibold mb-2 text-gray-700 mt-4">
+                                    <i className="fas fa-receipt mr-2"></i>
+                                    Individual Orders
+                                  </h4>
+                                  <div className="space-y-3">
+                                    {sales.map((sale) => {
+                                      const isSelected = selectedSales.has(sale.id);
+                                      return (
+                                        <div key={sale.id} className={`border rounded-lg p-3 transition-colors ${isSelected ? 'bg-blue-50 border-blue-300' : 'bg-white'}`}>
+                                          <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-3">
+                                              <input
+                                                type="checkbox"
+                                                checked={isSelected}
+                                                onChange={() => toggleSaleSelection(sale.id)}
+                                                className="w-5 h-5 rounded cursor-pointer"
+                                              />
+                                              <div>
+                                                <div className="font-medium">{sale.saleId}</div>
+                                                <div className="text-sm text-gray-500">
+                                                  {new Date(sale.createdAt).toLocaleDateString()} •
+                                                  {sale.processedBy.firstName} {sale.processedBy.lastName}
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                              <NotesIndicator
+                                                referenceType="sale"
+                                                referenceId={sale.id.toString()}
+                                                entityName={`Sale ${sale.saleId}`}
+                                              />
+                                              <Badge variant={sale.isPaid ? "default" : "destructive"}>
+                                                {sale.isPaid ? "Paid" : "Unpaid"}
+                                              </Badge>
+                                              <div className="text-right">
+                                                <div className="font-semibold">£{parseFloat(sale.totalAmount).toLocaleString()}</div>
+                                              </div>
+                                              {!sale.isPaid ? (
+                                                <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={() => handleMarkAsPaid(sale.id)}
+                                                  disabled={markAsPaidMutation.isPending}
+                                                >
+                                                  {markAsPaidMutation.isPending ? (
+                                                    <i className="fas fa-spinner fa-spin"></i>
+                                                  ) : (
+                                                    <>
+                                                      <i className="fas fa-check mr-1"></i>
+                                                      Mark as Paid
+                                                    </>
+                                                  )}
+                                                </Button>
+                                              ) : (
+                                                <Button
+                                                  size="sm"
+                                                  variant="ghost"
+                                                  className="text-gray-600 hover:text-red-600"
+                                                  onClick={() => handleMarkAsUnpaid(sale.id)}
+                                                  disabled={markAsUnpaidMutation.isPending}
+                                                >
+                                                  {markAsUnpaidMutation.isPending ? (
+                                                    <i className="fas fa-spinner fa-spin"></i>
+                                                  ) : (
+                                                    <>
+                                                      <i className="fas fa-undo mr-1"></i>
+                                                      Mark Unpaid
+                                                    </>
+                                                  )}
+                                                </Button>
+                                              )}
+                                            </div>
+                                          </div>
+
+                                          {/* Items List */}
+                                          <div className="mt-2 border-t pt-2">
+                                            <div className="text-sm font-medium text-gray-700 mb-1">Items:</div>
+                                            <div className="space-y-1">
+                                              {sale.items.map((item: any, idx: number) => {
+                                                const itemName = item.itemName || item.name || 'Unknown Item';
+                                                const itemSku = item.itemSku || item.sku || 'N/A';
+                                                const itemPrice = parseFloat(item.unitPrice || item.price || '0');
+                                                const itemQuantity = parseFloat(item.quantity || '0');
+                                                const itemTotal = itemQuantity * itemPrice;
+                                                return (
+                                                  <div key={idx} className="flex items-center justify-between text-sm bg-gray-50 p-2 rounded">
+                                                    <div className="text-gray-700">
+                                                      <div className="font-medium">{itemName}</div>
+                                                      <div className="text-xs text-gray-500">SKU: {itemSku}</div>
+                                                    </div>
+                                                    <span className="text-gray-600">
+                                                      {itemQuantity} × £{itemPrice.toFixed(2)} = £{itemTotal.toFixed(2)}
+                                                    </span>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {Object.keys(groupedSales).length === 0 && (
+                        <p className="text-center text-gray-500 py-8">No sales found for the selected filters</p>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <h3 className="text-lg font-semibold mb-3">Sales by Item</h3>
+                      <div className="space-y-3">
+                        {itemAnalysis.map((item) => {
+                          const isExpanded = expandedChargeCodes.has(item.name);
+                          const salesDates = Object.entries(item.salesByDate).sort((a, b) => a[0].localeCompare(b[0]));
+
+                          return (
+                            <div key={item.name} className="border rounded-lg bg-white">
+                              {/* Item Header */}
+                              <div
+                                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
+                                onClick={() => toggleChargeCode(item.name)}
+                              >
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  {isExpanded ? (
+                                    <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                                  ) : (
+                                    <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                                  )}
+                                  <div className="min-w-0 flex-1">
+                                    <div className="font-semibold text-lg truncate">{item.name}</div>
+                                    <div className="text-sm text-gray-500">
+                                      {item.totalQuantity} units • {item.orderCount} order{item.orderCount !== 1 ? 's' : ''} •
+                                      {item.chargeCodesArray.length} charge code{item.chargeCodesArray.length !== 1 ? 's' : ''}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                  <div className="font-bold text-xl text-green-700">
+                                    £{item.totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                  </div>
+                                  <div className="text-sm text-gray-500">
+                                    Avg: £{item.avgPrice.toFixed(2)}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Expanded Content - Show Order Pattern */}
+                              {isExpanded && (
+                                <div className="border-t bg-gray-50 p-4">
+                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    {/* Sales Over Time */}
+                                    <div>
+                                      <h4 className="text-md font-semibold mb-3 text-university-blue">
+                                        <i className="fas fa-chart-line mr-2"></i>
+                                        Order Pattern Over Time
+                                      </h4>
+                                      <div className="bg-white border rounded-lg p-3">
+                                        {salesDates.length > 0 ? (
+                                          <div className="space-y-2">
+                                            {salesDates.map(([date, quantity]) => {
+                                              const maxQty = Math.max(...Object.values(item.salesByDate));
+                                              const barWidth = (quantity / maxQty) * 100;
+
+                                              return (
+                                                <div key={date}>
+                                                  <div className="flex items-center justify-between text-sm mb-1">
+                                                    <span className="text-gray-600 font-medium">
+                                                      {new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: '2-digit' })}
+                                                    </span>
+                                                    <span className="font-semibold text-university-blue">
+                                                      {quantity} units
+                                                    </span>
+                                                  </div>
+                                                  <div className="w-full bg-gray-200 rounded-full h-2">
+                                                    <div
+                                                      className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full"
+                                                      style={{ width: `${barWidth}%` }}
+                                                    ></div>
+                                                  </div>
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        ) : (
+                                          <p className="text-center text-gray-500 py-4">No order data</p>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Charge Codes */}
+                                    <div>
+                                      <h4 className="text-md font-semibold mb-3 text-university-blue">
+                                        <i className="fas fa-credit-card mr-2"></i>
+                                        Ordered By Charge Codes
+                                      </h4>
+                                      <div className="bg-white border rounded-lg p-3">
+                                        <div className="flex flex-wrap gap-2">
+                                          {item.chargeCodesArray.map((code, idx) => (
+                                            <Badge key={idx} variant="secondary" className="text-sm">
+                                              {code}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      {/* Statistics */}
+                                      <div className="mt-4 bg-white border rounded-lg p-3">
+                                        <h4 className="text-sm font-semibold mb-2 text-gray-700">Statistics</h4>
+                                        <div className="space-y-2 text-sm">
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-600">Total Orders:</span>
+                                            <span className="font-semibold">{item.orderCount}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-600">Total Quantity:</span>
+                                            <span className="font-semibold">{item.totalQuantity}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-600">Avg per Order:</span>
+                                            <span className="font-semibold">
+                                              {(item.totalQuantity / item.orderCount).toFixed(1)} units
+                                            </span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span className="text-gray-600">Date Range:</span>
+                                            <span className="font-semibold text-xs">
+                                              {salesDates.length > 0 && (
+                                                <>
+                                                  {new Date(salesDates[0][0]).toLocaleDateString()} -
+                                                  {new Date(salesDates[salesDates.length - 1][0]).toLocaleDateString()}
+                                                </>
+                                              )}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {itemAnalysis.length === 0 && (
+                        <p className="text-center text-gray-500 py-8">
+                          {itemSearch ? `No items found matching "${itemSearch}"` : 'No items found for the selected filters'}
+                        </p>
+                      )}
+                    </>
+                  )}
+
+                  {/* Pagination */}
+                  {salesReport.data.pagination && salesReport.data.pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={salesReport.data.pagination.page === 1}
+                        onClick={() => setSalesFilters(prev => ({ ...prev, page: prev.page - 1 }))}
+                      >
+                        Previous
+                      </Button>
+                      <span className="text-sm text-gray-500">
+                        Page {salesReport.data.pagination.page} of {salesReport.data.pagination.totalPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={salesReport.data.pagination.page === salesReport.data.pagination.totalPages}
+                        onClick={() => setSalesFilters(prev => ({ ...prev, page: prev.page + 1 }))}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Visualizations Section */}
+      {salesReport?.data && salesReport.data.sales.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Top Items by Value */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <i className="fas fa-trophy mr-2 text-yellow-600"></i>
+                  Top Items by Value
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="top-k" className="text-sm font-normal">Show top:</Label>
+                  <Select
+                    value={topK.toString()}
+                    onValueChange={(value) => setTopK(parseInt(value))}
+                  >
+                    <SelectTrigger id="top-k" className="w-20 h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="15">15</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {topItemsByValue.length > 0 ? (
+                  topItemsByValue.map((item, index) => (
+                    <div key={item.name} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                          index === 0 ? 'bg-yellow-500' :
+                          index === 1 ? 'bg-gray-400' :
+                          index === 2 ? 'bg-amber-600' :
+                          'bg-blue-500'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="font-medium text-charcoal">{item.name}</div>
+                          <div className="text-sm text-gray-500">{item.quantity} units sold</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold text-green-700">
+                          £{item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          £{(item.value / item.quantity).toFixed(2)} avg
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-8">No item data available</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Top Items by Quantity */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <i className="fas fa-boxes mr-2 text-purple-600"></i>
+                  Top Items by Quantity
+                </div>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="top-k-qty" className="text-sm font-normal">Show top:</Label>
+                  <Select
+                    value={topK.toString()}
+                    onValueChange={(value) => setTopK(parseInt(value))}
+                  >
+                    <SelectTrigger id="top-k-qty" className="w-20 h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="15">15</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {topItemsByQuantity.length > 0 ? (
+                  topItemsByQuantity.map((item, index) => (
+                    <div key={item.name} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                          index === 0 ? 'bg-yellow-500' :
+                          index === 1 ? 'bg-gray-400' :
+                          index === 2 ? 'bg-amber-600' :
+                          'bg-purple-500'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="font-medium text-charcoal">{item.name}</div>
+                          <div className="text-sm text-gray-500">
+                            £{item.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total value
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold text-purple-700">
+                          {item.quantity} units
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          £{(item.value / item.quantity).toFixed(2)} avg
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-8">No item data available</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Sales Over Time */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <i className="fas fa-chart-line mr-2 text-blue-600"></i>
+                Sales Trend Over Time
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {salesOverTime.length > 0 ? (
+                  <>
+                    {/* Simple bar chart visualization */}
+                    <div className="space-y-2">
+                      {salesOverTime.slice(-14).map((day) => {
+                        const maxValue = Math.max(...salesOverTime.map(d => d.total));
+                        const barWidth = (day.total / maxValue) * 100;
+
+                        return (
+                          <div key={day.date} className="space-y-1">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600 font-medium">
+                                {new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                              </span>
+                              <span className="text-green-700 font-semibold">
+                                £{day.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-3">
+                              <div
+                                className="bg-gradient-to-r from-blue-500 to-green-500 h-3 rounded-full transition-all duration-300"
+                                style={{ width: `${barWidth}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Summary Stats */}
+                    <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-2">
+                      <div className="text-center">
+                        <div className="text-xs text-gray-500">Total Days</div>
+                        <div className="font-semibold text-lg">{salesOverTime.length}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-500">Avg per Day</div>
+                        <div className="font-semibold text-lg">
+                          £{(salesOverTime.reduce((sum, day) => sum + day.total, 0) / salesOverTime.length).toFixed(0)}
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-xs text-gray-500">Peak Day</div>
+                        <div className="font-semibold text-lg">
+                          £{Math.max(...salesOverTime.map(d => d.total)).toFixed(0)}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-center text-gray-500 py-8">No sales data available</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Charge Code Expiration Notifications */}
+      {expiringChargeCodes && expiringChargeCodes.length > 0 && (
+        <div className="mb-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <i className="fas fa-exclamation-triangle mr-2 text-warning"></i>
+                Charge Codes Expiring Soon
+                <Badge variant="destructive" className="ml-2">
+                  {expiringChargeCodes.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {expiringChargeCodes.map((chargeCode) => {
+                  const daysUntilExpiry = Math.ceil(
+                    (new Date(chargeCode.validUntil).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                  );
+                  const isUrgent = daysUntilExpiry <= 30;
+                  
+                  return (
+                    <div
+                      key={chargeCode.code}
+                      className={`flex items-center justify-between p-4 rounded-lg border ${
+                        isUrgent 
+                          ? 'bg-red-50 border-red-200' 
+                          : 'bg-yellow-50 border-yellow-200'
+                      }`}
+                    >
+                      <div>
+                        <p className="font-medium text-charcoal">
+                          {chargeCode.code} - {chargeCode.title}
+                        </p>
+                        <p className="text-sm text-medium-gray">
+                          {chargeCode.costCentre && `Cost Centre: ${chargeCode.costCentre} • `}
+                          Expires: {new Date(chargeCode.validUntil).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <Badge 
+                          variant={isUrgent ? "destructive" : "secondary"}
+                          className="mb-1"
+                        >
+                          {daysUntilExpiry} days left
+                        </Badge>
+                        <p className="text-xs text-medium-gray">
+                          {isUrgent ? 'Urgent' : 'Notice'}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="mt-4 text-center">
+                <p className="text-sm text-medium-gray">
+                  <i className="fas fa-info-circle mr-1"></i>
+                  Contact your administrator to extend or renew these charge codes
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+        </>
+      )}
+
+      {/* Inventory Analytics Tab */}
+      {activeTab === 'inventory' && (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Inventory Summary */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <i className="fas fa-chart-pie mr-2 text-university-blue"></i>
+              Inventory Summary
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="text-medium-gray">Total Items</span>
+                <span className="font-semibold text-charcoal">{stats?.totalItems || 0}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-medium-gray">Total Value</span>
+                <span className="font-semibold text-charcoal">
+                  £{stats?.totalValue?.toLocaleString() || "0"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-medium-gray">Low Stock Alerts</span>
+                <span className="font-semibold text-warning">{stats?.lowStockItems || 0}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-medium-gray">Active Users</span>
+                <span className="font-semibold text-charcoal">{stats?.activeUsers || 0}</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Category Breakdown */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <i className="fas fa-chart-bar mr-2 text-university-blue"></i>
+              Category Breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {Array.isArray(categoryStats) ? categoryStats.map((category: CategoryStat) => (
+                <div key={category.category.id} className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-8 h-8 bg-${category.category.color}-100 rounded-lg flex items-center justify-center`}>
+                      <i className={`${category.category.icon} text-${category.category.color}-600 text-sm`}></i>
+                    </div>
+                    <div>
+                      <p className="font-medium text-charcoal">{category.category.name}</p>
+                      <p className="text-xs text-medium-gray">{category.itemCount} items</p>
+                    </div>
+                  </div>
+                  <span className="font-semibold text-success">
+                    £{category.totalValue.toLocaleString()}
+                  </span>
+                </div>
+              )) : null}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Low Stock Alert */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <i className="fas fa-exclamation-triangle mr-2 text-warning"></i>
+              Low Stock Alerts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Array.isArray(lowStockItems) ? lowStockItems.slice(0, 5).map((item: LowStockItem) => (
+                <div key={item.id} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div>
+                    <p className="font-medium text-charcoal">{item.name}</p>
+                    <p className="text-xs text-medium-gray">SKU: {item.sku}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-warning">{item.currentStock}</p>
+                    <p className="text-xs text-medium-gray">Min: {item.minimumStock}</p>
+                  </div>
+                </div>
+              )) : null}
+              {(!lowStockItems || !Array.isArray(lowStockItems) || lowStockItems.length === 0) && (
+                <p className="text-center text-medium-gray py-4">No low stock alerts</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Stock Movements */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <i className="fas fa-exchange-alt mr-2 text-university-blue"></i>
+              Recent Stock Movements
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Array.isArray(stockMovements) ? stockMovements.slice(0, 5).map((movement: StockMovement) => (
+                <div key={movement.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                  <div>
+                    <p className="font-medium text-charcoal">{movement.item.name}</p>
+                    <p className="text-xs text-medium-gray">
+                      {movement.type.charAt(0).toUpperCase() + movement.type.slice(1)} • 
+                      {new Date(movement.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-semibold ${
+                      movement.type === 'in' ? 'text-success' : 
+                      movement.type === 'out' ? 'text-error' : 'text-warning'
+                    }`}>
+                      {movement.type === 'in' ? '+' : movement.type === 'out' ? '-' : '='}{Math.abs(movement.quantity)}
+                    </p>
+                    <p className="text-xs text-medium-gray">Stock: {movement.newStock}</p>
+                  </div>
+                </div>
+              )) : null}
+              {(!stockMovements || !Array.isArray(stockMovements) || stockMovements.length === 0) && (
+                <p className="text-center text-medium-gray py-4">No recent movements</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+          </div>
+        </>
+      )}
+
+      {/* Adjustment Dialog */}
+      <Dialog open={showAdjustmentDialog} onOpenChange={setShowAdjustmentDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create Charge Code Adjustment</DialogTitle>
+            <DialogDescription>
+              Create a refund (positive amount) or additional charge (negative amount) for a charge code.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {/* Charge Code Input */}
+            <div className="space-y-2">
+              <Label htmlFor="adj-chargecode">Charge Code</Label>
+              <Input
+                id="adj-chargecode"
+                value={adjustmentChargeCode}
+                onChange={(e) => setAdjustmentChargeCode(e.target.value)}
+                placeholder="e.g., PYW1001"
+              />
+            </div>
+            
+            {/* Amount Input */}
+            <div className="space-y-2">
+              <Label htmlFor="adj-amount">Amount (£)</Label>
+              <Input
+                id="adj-amount"
+                type="number"
+                step="0.01"
+                value={adjustmentAmount}
+                onChange={(e) => setAdjustmentAmount(e.target.value)}
+                placeholder="Positive for refund, negative for charge"
+              />
+              <p className="text-sm text-muted-foreground">
+                Positive amount = refund to charge code<br />
+                Negative amount = additional charge
+              </p>
+            </div>
+            
+            {/* Reason Input */}
+            <div className="space-y-2">
+              <Label htmlFor="adj-reason">Reason</Label>
+              <Textarea
+                id="adj-reason"
+                value={adjustmentReason}
+                onChange={(e) => setAdjustmentReason(e.target.value)}
+                placeholder="Reason for adjustment..."
+                rows={3}
+              />
+            </div>
+            
+            {/* Date Picker */}
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {format(adjustmentDate, "PPP")}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={adjustmentDate}
+                    onSelect={(date) => date && setAdjustmentDate(date)}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAdjustmentDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateAdjustment}>
+              Create Adjustment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

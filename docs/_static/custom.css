@@ -1,0 +1,177 @@
+/* Custom CSS for University Inventory Management System Documentation */
+
+/* University branding colors */
+:root {
+  --university-blue: #1976D2;
+  --university-dark: #0D47A1;
+  --charcoal: #424242;
+  --medium-gray: #757575;
+  --success: #4CAF50;
+  --warning: #FF9800;
+  --error: #F44336;
+}
+
+/* Header customization */
+.wy-nav-top {
+  background-color: var(--university-blue) !important;
+}
+
+.wy-nav-top a {
+  color: white !important;
+}
+
+/* Sidebar customization */
+.wy-nav-side {
+  background: linear-gradient(180deg, var(--university-blue) 0%, var(--university-dark) 100%);
+}
+
+.wy-menu-vertical a {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.wy-menu-vertical a:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+.wy-menu-vertical li.current > a {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-right: 3px solid white;
+}
+
+/* Code blocks */
+.highlight {
+  background-color: #f8f9fa !important;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+.highlight pre {
+  background-color: transparent !important;
+}
+
+/* Admonitions */
+.admonition {
+  border-radius: 4px;
+  border-left: 4px solid var(--university-blue);
+}
+
+.admonition.note {
+  border-left-color: var(--university-blue);
+  background-color: #e3f2fd;
+}
+
+.admonition.warning {
+  border-left-color: var(--warning);
+  background-color: #fff3e0;
+}
+
+.admonition.danger {
+  border-left-color: var(--error);
+  background-color: #ffebee;
+}
+
+.admonition.tip {
+  border-left-color: var(--success);
+  background-color: #e8f5e8;
+}
+
+/* Tables */
+.wy-table-responsive table td, 
+.wy-table-responsive table th {
+  white-space: normal !important;
+}
+
+table.docutils {
+  border-collapse: collapse;
+  border: 1px solid #e0e0e0;
+}
+
+table.docutils th {
+  background-color: var(--university-blue);
+  color: white;
+  font-weight: 600;
+}
+
+table.docutils td,
+table.docutils th {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+}
+
+/* Links */
+a {
+  color: var(--university-blue) !important;
+}
+
+a:hover {
+  color: var(--university-dark) !important;
+}
+
+/* Badges/Labels */
+.badge {
+  background-color: var(--university-blue);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8em;
+}
+
+/* Custom utility classes */
+.university-blue {
+  color: var(--university-blue);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* API endpoint styling */
+.http-method {
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: white;
+  font-size: 0.8em;
+}
+
+.http-get {
+  background-color: var(--success);
+}
+
+.http-post {
+  background-color: var(--university-blue);
+}
+
+.http-put {
+  background-color: var(--warning);
+}
+
+.http-delete {
+  background-color: var(--error);
+}
+
+/* JSON syntax highlighting */
+.highlight .s2 { color: #d14; } /* strings */
+.highlight .mi { color: #099; } /* numbers */
+.highlight .kc { color: #099; } /* booleans */
+.highlight .k { color: #333; font-weight: bold; } /* keywords */
+
+/* Status indicators */
+.status-ok { color: var(--success); }
+.status-warning { color: var(--warning); }
+.status-error { color: var(--error); }
+
+/* Feature icons */
+.feature-icon {
+  font-size: 1.2em;
+  margin-right: 8px;
+  color: var(--university-blue);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .wy-table-responsive table {
+    font-size: 0.9em;
+  }
+}
