@@ -1,0 +1,117 @@
+# DEPRECATED: This workflow has been consolidated into main.yml
+# Please use main.yml instead for all CI/CD operations
+# This file is kept for reference but will not execute
+
+# name: "Security Scanning"
+
+on:
+  # push:
+  #   branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  dependency-scanning:
+    name: Dependency Scanning
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=moderate --json > npm-audit.json || true
+          
+      - name: Run Retire.js
+        run: |
+          npx retire --js --node --outputformat json --outputpath retire-report.json || true
+        continue-on-error: true
+
+      - name: Upload dependency scan results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-scan-results
+          path: |
+            npm-audit.json
+            retire-report.json
+
+  # External security scanning tools commented out for private repo
+  # 
+  # secret-scanning:
+  #   name: Secret Scanning
+  #   runs-on: self-hosted
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
+  # 
+  #     - name: Run TruffleHog OSS
+  #       uses: trufflesecurity/trufflehog@main
+  #       with:
+  #         path: ./
+  #         base: main
+  #         head: HEAD
+  #         extra_args: --debug --only-verified
+  #
+  # container-scanning:
+  #   name: Container Security Scanning
+  #   runs-on: self-hosted
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  # 
+  #     - name: Build Docker image
+  #       run: |
+  #         docker build -t security-scan:latest --target production .
+  # 
+  #     - name: Run Trivy vulnerability scanner
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         image-ref: 'security-scan:latest'
+  #         format: 'sarif'
+  #         output: 'trivy-image-results.sarif'
+  # 
+  #     - name: Upload Trivy scan results to GitHub Security tab
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       if: always()
+  #       with:
+  #         sarif_file: 'trivy-image-results.sarif'
+  #         category: 'trivy-container-scan'
+  #
+  # infrastructure-scanning:
+  #   name: Infrastructure as Code Scanning
+  #   runs-on: self-hosted
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  # 
+  #     - name: Run Trivy IaC scanner
+  #       uses: aquasecurity/trivy-action@master
+  #       with:
+  #         scan-type: 'config'
+  #         scan-ref: '.'
+  #         format: 'sarif'
+  #         output: 'trivy-iac-results.sarif'
+  # 
+  #     - name: Upload Trivy IaC scan results
+  #       uses: github/codeql-action/upload-sarif@v3
+  #       if: always()
+  #       with:
+  #         sarif_file: 'trivy-iac-results.sarif'
+  #         category: 'trivy-iac-scan'

@@ -1,0 +1,252 @@
+name: E2E Tests (Standalone)
+
+on:
+    # push:
+    #   branches: [ main ]
+    #   paths-ignore:
+    #     - 'docker-compose*.yml'
+    #     - 'docs/**'
+    #     - '*.md'
+    #     - '.env.example'
+    #     - '.env.prod.example'
+    #     - '.env.prod.template'
+    #     - 'scripts/**'
+    #     - 'deploy-*.ps1'
+    #     - 'deploy-*.sh'
+    #     - 'setup-*.ps1'
+    #     - 'setup-*.sh'
+    #     - 'Makefile'
+    #     - '*.log'
+    #     - 'logs/**'
+    #     - 'reports/**'
+    #     - 'coverage/**'
+    #     - 'playwright-report/**'
+    #     - 'test-results.log'
+    #     - 'junit.xml'
+    #     - 'token.txt'
+    #     - 'kube.yml'
+    #     - 'nginx/**'
+    #     - 'certbot/**'
+    #     - 'secrets/**'
+    #     - 'appkey/**'
+    #     - 'bridge/**'
+    # pull_request:
+    #   branches: [ main ]
+    #   paths-ignore:
+    #     - 'docker-compose*.yml'
+    #     - 'docs/**'
+    #     - '*.md'
+    #     - '.env.example'
+    #     - '.env.prod.example'
+    #     - '.env.prod.template'
+    #     - 'scripts/**'
+    #     - 'deploy-*.ps1'
+    #     - 'deploy-*.sh'
+    #     - 'setup-*.ps1'
+    #     - 'setup-*.sh'
+    #     - 'Makefile'
+    #     - '*.log'
+    #     - 'logs/**'
+    #     - 'reports/**'
+    #     - 'coverage/**'
+    #     - 'playwright-report/**'
+    #     - 'test-results.log'
+    #     - 'junit.xml'
+    #     - 'token.txt'
+    #     - 'kube.yml'
+    #     - 'nginx/**'
+    #     - 'certbot/**'
+    #     - 'secrets/**'
+    #     - 'appkey/**'
+    #     - 'bridge/**'
+    workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+  POSTGRES_PASSWORD: password
+  POSTGRES_USER: postgres
+  POSTGRES_DB: university_inventory
+  # E2E Test specific ports to avoid conflicts with production
+  E2E_APP_PORT: 5001
+  E2E_DB_PORT: 5433
+  E2E_REDIS_PORT: 6380
+
+jobs:
+  e2e-tests:
+    name: Playwright E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          echo "📦 Installing dependencies..."
+          npm ci
+
+      - name: Install Playwright Browsers
+        run: |
+          echo "🎭 Installing Playwright browsers..."
+          npx playwright install --with-deps chromium
+
+      - name: Build required Docker images
+        run: |
+          echo "🐳 Building Docker images for E2E testing..."
+
+          # Build the replit-auth service first
+          echo "Building replit-auth service..."
+          docker compose -p lustores-e2e build replit-auth
+
+          # Build the main application
+          echo "Building main application..."
+          docker compose -p lustores-e2e build app
+
+          # Verify images
+          echo "📋 Built images:"
+          docker images | grep -E "(lustores|replit-auth)" || echo "Images built with different names"
+
+      - name: Start application stack
+        run: |
+          echo "🚀 Starting application with Docker Compose on E2E ports..."
+          
+          # Create E2E specific docker-compose override
+          cat > docker-compose.e2e-override.yml << EOF
+          services:
+            app:
+              ports:
+                - "${E2E_APP_PORT}:5000"
+              environment:
+                - NODE_ENV=production
+                - PORT=5000
+                - DB_HOST=db
+                - DB_PORT=5432
+                - DB_NAME=university_inventory
+                - DB_USER=postgres
+                - DB_PASSWORD=password
+                - REDIS_HOST=redis
+                - REDIS_PORT=6379
+            db:
+              ports:
+                - "${E2E_DB_PORT}:5432"
+            redis:
+              ports:
+                - "${E2E_REDIS_PORT}:6379"
+          EOF
+          
+          # Start the full stack with override using separate project name to avoid conflicts
+          docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml up -d
+
+          # Wait for services to initialize
+          echo "⏳ Waiting for services to start..."
+          sleep 15
+
+          # Check service status
+          echo "📊 Service status:"
+          docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml ps
+
+          # Show startup logs
+          echo "📋 Application logs:"
+          docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml logs app --tail=30
+          echo "📋 Database logs:"
+          docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml logs db --tail=10
+
+      - name: Wait for application readiness
+        timeout-minutes: 5
+        run: |
+          echo "🔍 Waiting for application to be ready on port ${E2E_APP_PORT}..."
+          
+          # Health check with retries
+          for i in {1..60}; do
+            if curl -f http://localhost:${E2E_APP_PORT}/health >/dev/null 2>&1; then
+              echo "✅ Application is ready!"
+              break
+            else
+              echo "⏳ Waiting for app... (attempt $i/60)"
+              sleep 5
+              if [ $i -eq 60 ]; then
+                echo "❌ Application failed to start within timeout"
+                echo "📋 Final Docker status:"
+                docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml ps
+                echo "📋 App logs:"
+                docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml logs app --tail=50
+                echo "📋 Database logs:"
+                docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml logs db --tail=20
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Verify connectivity
+        run: |
+          echo "🔍 Verifying connectivity on E2E ports..."
+          
+          # Test HTTP endpoint
+          echo "Testing HTTP endpoint on port ${E2E_APP_PORT}:"
+          curl -v http://localhost:${E2E_APP_PORT}/health
+          
+          # Test database connectivity
+          echo "Testing database connectivity on port ${E2E_DB_PORT}:"
+          docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml exec -T db psql -U postgres -d university_inventory -c "SELECT version();" || {
+            echo "❌ Database connectivity failed"
+            docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml logs db --tail=20
+            exit 1
+          }
+          
+          # Test if dev_admin_001 user exists (critical for tests)
+          echo "Checking for dev_admin_001 user:"
+          curl -s http://localhost:${E2E_APP_PORT}/api/users | grep -q "dev_admin_001" && {
+            echo "✅ dev_admin_001 user found"
+          } || {
+            echo "⚠️ dev_admin_001 user not found - this may cause test failures"
+          }
+
+      - name: Run Playwright Tests
+        timeout-minutes: 120
+        run: |
+          echo "🎭 Running Playwright E2E tests on port ${E2E_APP_PORT}..."
+        
+          # Set the base URL for tests to use E2E port
+          export TEST_BASE_URL="http://localhost:${E2E_APP_PORT}"
+          export E2E_APP_PORT="${E2E_APP_PORT}"
+        
+          # Run tests with comprehensive reporting
+          npx playwright test \
+            --reporter=html,junit,list \
+            --output=test-results \
+
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: playwright-report-${{ github.run_number }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 1
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: test-results-${{ github.run_number }}
+          path: |
+            test-results/
+            reports/
+          retention-days: 1
+
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "🧹 Cleaning up E2E test environment..."
+          docker compose -p lustores-e2e -f docker-compose.yml -f docker-compose.e2e-override.yml down -v --remove-orphans || true
+          docker system prune -f || true
+          rm -f docker-compose.e2e-override.yml || true

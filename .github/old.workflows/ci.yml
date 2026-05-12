@@ -1,0 +1,420 @@
+# DEPRECATED: This workflow has been consolidated into main.yml
+# Please use main.yml instead for all CI/CD operations
+# This file is kept for reference but will not execute
+
+# name: Automated Testing and CI
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+env:
+  NODE_VERSION: '24'
+  POSTGRES_VERSION: '15'
+  COMPOSE_PROJECT_NAME: 'lustores'
+
+jobs:
+  setup:
+    name: Setup Dependencies
+    runs-on: self-hosted
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          echo "key=node-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            node-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+  lint-and-type-check:
+    name: Lint and Type Check
+    runs-on: self-hosted
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Type check
+        run: npm run check
+
+      - name: Lint (if configured)
+        run: |
+          if npm run lint --dry-run > /dev/null 2>&1; then
+            npm run lint
+          else
+            echo "No lint script found, skipping..."
+          fi
+
+  test:
+    name: Run Tests
+    runs-on: self-hosted
+    needs: setup
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_inventory
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Setup test database schema
+        run: |
+          # Run migrations to set up schema
+          npm run db:migrate
+          
+          # Verify schema
+          npm run db:verify
+
+      - name: Run unit tests
+        run: npm run test:ci
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/test_inventory
+          SESSION_SECRET: test-secret-key
+
+      - name: Run sales tests (if available)
+        run: |
+          if npm run test:sales --dry-run > /dev/null 2>&1; then
+            npm run test:sales
+          else
+            echo "No sales tests found, skipping..."
+          fi
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/test_inventory
+          SESSION_SECRET: test-secret-key
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+  docker-build-and-test:
+    name: Docker Build and Test
+    runs-on: self-hosted
+    needs: setup
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Docker images
+        run: |
+          # Build with cache
+          docker buildx build \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
+            --target=production \
+            --tag lustores:latest \
+            --load .
+          
+          # Build test image if profile exists
+          if docker compose --profile testing config > /dev/null 2>&1; then
+            docker compose --profile testing build test
+          fi
+
+      - name: Run Docker tests (if available)
+        run: |
+          if docker compose --profile testing config > /dev/null 2>&1; then
+            docker compose --profile testing up test --abort-on-container-exit
+          else
+            echo "No Docker test profile found, skipping..."
+          fi
+
+      - name: Extract coverage from container
+        if: always()
+        run: |
+          # Get the actual container name from docker compose
+          CONTAINER_NAME=$(docker compose --profile testing ps -q test 2>/dev/null || echo "")
+          if [ ! -z "$CONTAINER_NAME" ]; then
+            docker cp $CONTAINER_NAME:/app/coverage ./docker-coverage || echo "No coverage found in container"
+          fi
+
+      - name: Upload Docker test coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-coverage-report
+          path: docker-coverage/
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Cleanup
+        if: always()
+        run: docker compose --profile testing down -v
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: self-hosted
+    needs: [docker-build-and-test]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+
+      - name: Build required images (using cache)
+        run: |
+          docker buildx build \
+            --cache-from=type=local,src=/tmp/.buildx-cache \
+            --target=production \
+            --tag lustores:latest \
+            --load .
+
+      - name: Start application stack
+        run: |
+          docker compose up -d app
+          docker compose --profile integration up -d test-db
+
+      - name: Wait for services to be ready
+        run: |
+          timeout 60 bash -c 'until docker compose exec -T app wget --spider -q http://localhost:5000/health; do sleep 2; done'
+
+      - name: Run integration tests
+        run: docker compose --profile integration up test-integration --abort-on-container-exit
+
+      - name: Get application logs
+        if: failure()
+        run: |
+          echo "=== Application Logs ==="
+          docker compose logs app
+          echo "=== Test Database Logs ==="
+          docker compose logs test-db
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose --profile integration down -v
+          docker compose down -v
+
+  security-scan:
+    name: Security Scan
+    runs-on: self-hosted
+    needs: setup
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Run npm audit
+        run: npm audit --audit-level critical
+        continue-on-error: true
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.32.0
+        continue-on-error: true
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+
+      - name: Check if SARIF file exists
+        id: check-sarif
+        run: |
+          if [ -f "trivy-results.sarif" ]; then
+            echo "sarif_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "sarif_exists=false" >> $GITHUB_OUTPUT
+            echo "Warning: trivy-results.sarif not found"
+          fi
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: steps.check-sarif.outputs.sarif_exists == 'true'
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: 'trivy-fs-scan'
+        continue-on-error: true
+
+  test-reports:
+    name: Generate Test Reports
+    runs-on: self-hosted
+    needs: [test, docker-build-and-test]
+    if: always()
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*coverage*'
+          merge-multiple: true
+          path: ./coverage-reports/
+
+      - name: Generate combined test report
+        run: |
+          echo "# Test Results Summary" > test-summary.md
+          echo "" >> test-summary.md
+          echo "## Test Jobs Status" >> test-summary.md
+          echo "- Unit/Sales Tests: ${{ needs.test.result }}" >> test-summary.md
+          echo "- Docker Tests: ${{ needs.docker-build-and-test.result }}" >> test-summary.md
+          echo "" >> test-summary.md
+          echo "Generated on: $(date)" >> test-summary.md
+
+      - name: Upload test summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-summary
+          path: test-summary.md
+
+  deployment-readiness:
+    name: Deployment Readiness Check
+    runs-on: self-hosted
+    needs: [lint-and-type-check, test, docker-build-and-test, integration-tests, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Check all tests passed
+        run: |
+          echo "All tests and checks have passed!"
+          echo "✅ Lint and Type Check: ${{ needs.lint-and-type-check.result }}"
+          echo "✅ Tests: ${{ needs.test.result }}"
+          echo "✅ Docker Build and Test: ${{ needs.docker-build-and-test.result }}"
+          echo "✅ Integration Tests: ${{ needs.integration-tests.result }}"
+          echo "✅ Security Scan: ${{ needs.security-scan.result }}"
+          echo ""
+          echo "🚀 Ready for deployment!"
+
+      - name: Create deployment marker
+        run: |
+          echo "deployment-ready" > deployment-status.txt
+          echo "timestamp: $(date -u)" >> deployment-status.txt
+          echo "commit: ${{ github.sha }}" >> deployment-status.txt
+
+      - name: Upload deployment status
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-status
+          path: deployment-status.txt

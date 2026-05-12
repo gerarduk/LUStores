@@ -1,0 +1,188 @@
+# DEPRECATED: This workflow has been consolidated into main.yml
+# Please use main.yml instead for all CI/CD operations
+# This file is kept for reference but will not execute
+
+# name: CI - Tests, Build, and Deploy Docs
+
+on:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on:  self-hosted
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_inventory
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24' # Updated to match project Node version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run API tests
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/test_inventory
+          SESSION_SECRET: test-secret-key
+        # TO DO: add in DATABASE URL < OR REMOVE SPECIFIC TESTS TO OTHER FILE! Needs a bit more finessing as to whether this file is correct. 
+        run: npm run test:ci # Assumes this script runs Jest and outputs JUnit XML
+
+      - name: Upload API Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-test-results
+          path: reports/junit/js-test-results.xml
+
+  build_docker:
+    runs-on:  self-hosted
+    needs: test # Run after tests pass
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false # Do not push yet, only build for testing
+          load: true # Load the image into local Docker daemon
+          tags: local/lustores-app:latest
+
+      - name: Download container-structure-test
+        run: |
+          mkdir -p $HOME/bin
+          curl -Lo $HOME/bin/container-structure-test https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64
+          chmod +x $HOME/bin/container-structure-test
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Run Docker image tests
+        run: |
+          container-structure-test test --image local/lustores-app:latest --config ./tests/docker/container_structure_test.yaml
+
+      # Optional: Upload Docker test results if any (e.g., if container-structure-test outputs a report)
+      # - name: Upload Docker Test Results
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-test-results
+      #     path: path/to/docker/test/report.xml
+
+  build_docs:
+    runs-on:  self-hosted
+    needs: [test, build_docker] # Run after tests and Docker build pass
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx sphinx-rtd-theme sphinxcontrib-openapi myst-parser
+
+    - name: Build documentation
+      run: |
+        cd docs
+        make html
+
+    # This step will combine test results into the docs
+    - name: Download API test results artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: api-test-results
+        path: docs/_build/html/reports/ # Place it where Sphinx can find it or be pointed to it
+
+    # Placeholder for a script/tool to integrate JUnit XML into Sphinx
+    # This might involve a custom Sphinx extension or a Python script to convert XML to reStructuredText/HTML
+    - name: Integrate Test Results into Docs
+      run: |
+        echo "Placeholder: Script to convert JUnit XML to Sphinx-compatible format and update docs"
+        # Example: find docs/_build/html/reports/js-test-results.xml and process it
+        # For now, let's just copy it to a known location in the docs output
+        mkdir -p docs/_build/html/test-reports
+        cp docs/_build/html/reports/js-test-results.xml docs/_build/html/test-reports/api-test-report.xml
+        echo "Test report copied to docs/_build/html/test-reports/api-test-report.xml"
+        # You would then need to reference this file from your Sphinx .rst files
+        # or have a custom Sphinx extension that reads it and generates content.
+
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation-with-reports
+        path: docs/_build/html/
+
+    - name: Setup Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: actions/configure-pages@v5
+
+    - name: Upload to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: docs/_build/html
+
+  deploy_docs:
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on:  self-hosted
+    needs: build_docs
+    
+    # Grant GITHUB_TOKEN the permissions required for Pages deployment
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Download documentation artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation-with-reports
+          path: docs/_build/html/
+          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
+          publish_branch: gh-pages
+          force_orphan: true
