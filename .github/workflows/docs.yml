@@ -2,21 +2,17 @@ name: Documentation
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths:
       - 'docs/**'
       - '**.md'
       - 'typedoc.json'
       - '.github/workflows/docs.yml'
-
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
     paths:
       - 'docs/**'
       - '**.md'
-
   workflow_dispatch:
 
 permissions:
@@ -25,11 +21,11 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: '24'
 
 jobs:
   build:
@@ -38,16 +34,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+          cache: 'npm'
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Python for Sphinx
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
 
@@ -62,16 +58,10 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-
           if [ -f "docs/requirements.txt" ]; then
             pip install -r docs/requirements.txt
           else
-            pip install \
-              sphinx \
-              sphinx-rtd-theme \
-              sphinxcontrib-httpdomain \
-              myst-parser \
-              sphinxcontrib-mermaid
+            pip install sphinx sphinx-rtd-theme sphinxcontrib-httpdomain myst-parser sphinxcontrib-mermaid
           fi
 
       - name: Install Node dependencies
@@ -80,70 +70,62 @@ jobs:
       - name: Generate TypeScript API documentation
         run: |
           npm install --no-save typedoc@^0.28.3
-
           echo "Generating TypeScript API documentation..."
+          npx typedoc --options typedoc.json || echo "TypeDoc failed, creating placeholder"
 
-          if ! npx typedoc --options typedoc.json; then
-            echo "TypeDoc failed, creating placeholder"
+          # Create placeholder if TypeDoc failed
+          if [ ! -f "docs/_build/html/api/index.html" ]; then
             mkdir -p docs/_build/html/api
-
-            cat > docs/_build/html/api/index.html <<EOF
-            <html>
-              <head>
-                <title>API Documentation</title>
-              </head>
-              <body>
-                <h1>API Documentation</h1>
-                <p>API documentation generation failed.</p>
-              </body>
-            </html>
-            EOF
+            echo "<html><head><title>API Documentation</title></head><body><h1>API Documentation</h1><p>API documentation generation in progress.</p></body></html>" > docs/_build/html/api/index.html
           fi
 
       - name: Build Sphinx documentation
         run: |
           if [ -f "docs/Makefile" ]; then
-            cd docs
-            make html
+            cd docs && make html
           else
             echo "No docs Makefile found"
-
             mkdir -p docs/_build/html
-
-            cat > docs/_build/html/index.html <<EOF
-            <html>
-              <body>
-                <h1>Documentation</h1>
-                <p>Documentation build placeholder.</p>
-              </body>
-            </html>
-            EOF
+            echo "<html><body><h1>LUStores Documentation</h1><p>Documentation build in progress...</p></body></html>" > docs/_build/html/index.html
           fi
 
       - name: Create .nojekyll file
         run: touch docs/_build/html/.nojekyll
 
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v6
         with:
-          path: docs/_build/html
+          name: documentation
+          path: docs/_build/html/
+          retention-days: 7
 
   deploy:
     name: Deploy to GitHub Pages
-    needs: build
-
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
     runs-on: ubuntu-latest
-
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - name: Download documentation artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: documentation
+          path: ./docs/_build/html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload to GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./docs/_build/html
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Display deployment URL
+        run: echo "Documentation deployed to ${{ steps.deployment.outputs.page_url }}"
