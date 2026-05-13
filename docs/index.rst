@@ -1,4 +1,4 @@
-University Inventory Management System Documentation
+University Inventory Management System Documentation (Gerards Version)
 ====================================================
 
 Welcome to the comprehensive documentation for the University Inventory Management System - a modern, secure, and scalable solution for managing university assets, equipment, and supplies.
