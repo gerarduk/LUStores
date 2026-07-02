@@ -14,8 +14,8 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/lustores
-  REPLIT_AUTH_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/replitauth
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/lustorestest
+  REPLIT_AUTH_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/replitauthtest
 
 jobs:
   build-and-push:
