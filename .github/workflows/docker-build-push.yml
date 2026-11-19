@@ -15,7 +15,6 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/lustores
-  REPLIT_AUTH_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/replitauth
 
 jobs:
   build-and-push:
@@ -61,29 +60,7 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
             CACHE_BUSTER=${{ github.run_id }}-${{ github.run_number }}
 
-      - name: Extract metadata for replit-auth
-        id: meta-auth
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.REPLIT_AUTH_IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push replit-auth image
-        uses: docker/build-push-action@v6
-        with:
-          context: ./docker/replit-auth
-          push: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' }}
-          tags: ${{ steps.meta-auth.outputs.tags }}
-          labels: ${{ steps.meta-auth.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
       - name: Image digest
         if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           echo "Main app: ${{ steps.meta-app.outputs.tags }}"
-          echo "Replit auth: ${{ steps.meta-auth.outputs.tags }}"

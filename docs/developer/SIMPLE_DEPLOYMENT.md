@@ -78,7 +78,6 @@ Your deployment includes:
 |---------|---------|------|-------------|
 | **nginx** | Reverse proxy + SSL | 80, 443 | ❌ |
 | **app** | Main application | Internal | ✅ |
-| **replit-auth** | Authentication service | 3001 | ✅ |
 | **db** | PostgreSQL database | 5432 | ❌ |
 | **redis** | Cache & sessions | 6379 | ❌ |
 | **certbot** | SSL certificate renewal | - | ❌ |

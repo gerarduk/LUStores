@@ -101,17 +101,13 @@ jobs:
         run: |
           echo "🐳 Building Docker images for E2E testing..."
 
-          # Build the replit-auth service first
-          echo "Building replit-auth service..."
-          docker compose -p lustores-e2e build replit-auth
-
           # Build the main application
           echo "Building main application..."
           docker compose -p lustores-e2e build app
 
           # Verify images
           echo "📋 Built images:"
-          docker images | grep -E "(lustores|replit-auth)" || echo "Images built with different names"
+          docker images | grep -E "lustores" || echo "Images built with different names"
 
       - name: Start application stack
         run: |

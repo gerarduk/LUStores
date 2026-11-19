@@ -68,21 +68,6 @@ Authentication Configuration
    - **Generation**: `openssl rand -hex 32`
    - **Example**: `SESSION_SECRET=abc123def456...`
 
-**REPL_ID**
-   - **Description**: Replit application identifier for OAuth
-   - **Required**: Yes (for Replit authentication)
-   - **Example**: `REPL_ID=your-repl-application-id`
-
-**REPLIT_DOMAINS**
-   - **Description**: Comma-separated list of allowed domains
-   - **Required**: Yes
-   - **Example**: `REPLIT_DOMAINS=yourdomain.com,www.yourdomain.com,localhost:5000`
-
-**ISSUER_URL**
-   - **Description**: OAuth issuer URL
-   - **Default**: `https://replit.com/oidc`
-   - **Example**: `ISSUER_URL=https://auth.university.edu/oidc`
-
 Optional Configuration
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -116,11 +101,6 @@ For development and testing, create a `.env` file in the project root:
    
    # Session Security
    SESSION_SECRET=your-super-secure-session-secret-here
-   
-   # Authentication
-   REPL_ID=your-repl-id
-   REPLIT_DOMAINS=localhost:5000,127.0.0.1:5000
-   ISSUER_URL=https://replit.com/oidc
 
 Docker Environment
 ~~~~~~~~~~~~~~~~~~
@@ -135,8 +115,6 @@ For Docker deployments, configure environment variables in `docker-compose.yml`:
          - NODE_ENV=production
          - DATABASE_URL=postgresql://postgres:password@db:5432/university_inventory
          - SESSION_SECRET=your-secure-session-secret
-         - REPL_ID=your-repl-id
-         - REPLIT_DOMAINS=yourdomain.com
 
 System Environment
 ~~~~~~~~~~~~~~~~~~
@@ -251,18 +229,6 @@ The application automatically configures secure cookies based on environment:
 Authentication Security
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-**OAuth Configuration:**
-
-Ensure proper OAuth settings:
-
-.. code-block:: bash
-
-   # Use university domain for production
-   REPLIT_DOMAINS=inventory.university.edu
-   
-   # Multiple domains for development
-   REPLIT_DOMAINS=localhost:5000,127.0.0.1:5000,dev.university.edu
-
 **HTTPS Requirements:**
 
 For production deployments:
@@ -343,7 +309,6 @@ Development Environment
    NODE_ENV=development
    LOG_LEVEL=debug
    DATABASE_URL=postgresql://postgres:password@localhost:5432/inventory_dev
-   REPLIT_DOMAINS=localhost:5000,127.0.0.1:5000
 
 Production Environment
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -353,7 +318,6 @@ Production Environment
    NODE_ENV=production
    LOG_LEVEL=warn
    DATABASE_URL=postgresql://inventory_user:secure_pass@db.university.edu:5432/university_inventory
-   REPLIT_DOMAINS=inventory.university.edu
    SESSION_SECRET=very-secure-random-string-for-production
 
 Docker Production
@@ -368,8 +332,6 @@ Docker Production
          - NODE_ENV=production
          - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@db:5432/university_inventory
          - SESSION_SECRET=${SESSION_SECRET}
-         - REPL_ID=${REPL_ID}
-         - REPLIT_DOMAINS=${DOMAIN_NAME}
        restart: unless-stopped
 
 Configuration Validation
@@ -413,10 +375,9 @@ Common Issues
 
 **Authentication Issues:**
 
-1. Verify REPL_ID and domain configuration
-2. Check OAuth callback URLs
-3. Confirm SESSION_SECRET is set
-4. Test authentication flow
+1. Confirm SESSION_SECRET is set
+2. Check the app logs for authentication errors
+3. Test authentication flow
 
 **Permission Errors:**
 

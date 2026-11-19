@@ -216,7 +216,7 @@ generate_debug_report() {
         check_compose_status
         
         # Analyze each service
-        for service in app replit-auth db redis nginx certbot watchtower githubrunner; do
+        for service in app db redis nginx certbot watchtower githubrunner; do
             container_name="${PROJECT_NAME}-${service}-1"
             if docker ps -a --format "{{.Names}}" | grep -q "$container_name"; then
                 analyze_container_logs "$container_name" 200

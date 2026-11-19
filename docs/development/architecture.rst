@@ -114,7 +114,6 @@ Project Root Structure
    │   ├── index.ts          # Server entry point
    │   ├── routes.ts         # API route definitions
    │   ├── storage.ts        # Data access layer
-   │   ├── replitAuth.ts     # Replit OAuth implementation
    │   ├── universitySso.ts  # SAML SSO implementation
    │   └── vite.ts           # Development server integration
    ├── shared/               # Shared code between client/server

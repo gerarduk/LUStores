@@ -23,7 +23,6 @@ This guide covers deploying LUStores in a production environment with Redis cach
    DATABASE_URL=postgresql://postgres:your_secure_password@db:5432/university_inventory
    SESSION_SECRET=your_very_secure_session_secret_at_least_32_characters_long
    REDIS_URL=redis://:your_redis_password@redis:6379
-   REPLIT_DOMAINS=your-domain.com
    ```
 
 3. **Deploy using the provided script:**
@@ -61,7 +60,6 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
 - **app**: Main LUStores application
 - **db**: PostgreSQL database with persistent storage
 - **redis**: Redis cache with persistence and optional password protection
-- **replit-auth**: Authentication service
 
 ### Monitoring & Updates
 
@@ -76,14 +74,13 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:password@db:5432/university_inventory` |
 | `REDIS_URL` | Redis connection string | `redis://redis:6379` |
 | `SESSION_SECRET` | Session encryption key | `your-secret-key-here` |
-| `REPLIT_DOMAINS` | Allowed domains for the application | `localhost:5000` |
 | `WATCHTOWER_POLL_INTERVAL` | Update check interval (seconds) | `300` |
 
 ### Watchtower Configuration
 
 Watchtower automatically updates containers based on labels:
 
-- **Enabled for updates**: `app`, `redis`, `replit-auth`
+- **Enabled for updates**: `app`, `redis`
 - **Disabled for updates**: `db` (database safety), `watchtower` (self-update prevention)
 
 #### Notification Setup

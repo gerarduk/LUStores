@@ -201,11 +201,6 @@ Configure the following environment variables:
    NODE_ENV=production
    SESSION_SECRET=your-super-secure-session-secret-here
 
-   # Authentication Configuration
-   REPL_ID=your-replit-application-id
-   REPLIT_DOMAINS=yourdomain.com,www.yourdomain.com
-   ISSUER_URL=https://replit.com/oidc
-
    # Optional: Redis Configuration (for session caching)
    REDIS_URL=redis://localhost:6379
 

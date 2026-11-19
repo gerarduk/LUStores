@@ -16,14 +16,9 @@ services:
       - DATABASE_URL=postgresql://postgres:password@db:5432/university_inventory
       - SESSION_SECRET=your-secret-key-here
       - DEV_ADMIN_OVERRIDE=true
-      - REPL_ID=local-dev-repl
-      - REPLIT_DOMAINS=localhost:5000
-      - ISSUER_URL=http://replit-auth:3001/oidc
     depends_on:
       db:
         condition: service_healthy
-      replit-auth:
-        condition: service_started
     # restart: unless-stopped
     dns_opt:
       - "single-request-reopen"
@@ -63,22 +58,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-  # Local Replit Authentication Service
-  replit-auth:
-    build:
-      context: ./docker/replit-auth
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - JWT_SECRET=local-replit-jwt-secret
-      - ALLOWED_ORIGINS=http://localhost:5000
-    # restart: unless-stopped
-    # profiles:
-    #   - testing
-    #   - integration
-    #   - development
 
   db:
     image: postgres:15-alpine

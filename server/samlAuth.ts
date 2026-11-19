@@ -6,7 +6,6 @@
  * Current Status:
  * - setupSamlAuth() is never imported or called anywhere in the codebase
  * - universitySso.ts handles SAML authentication instead (with similar implementation)
- * - replitAuth.ts handles Replit OIDC (also unused)
  * - localAuth.ts provides the active fallback authentication
  * 
  * Recommendation:

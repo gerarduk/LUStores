@@ -95,7 +95,6 @@ Automated Execution
 
    # Docker Compose services started for testing
    - app: Main application server
-   - replit-auth: Authentication service
    - db: PostgreSQL database
    - redis: Session storage
 
@@ -233,7 +232,6 @@ Common Issues
    
    # View service logs
    docker compose logs app
-   docker compose logs replit-auth
 
 **2. Authentication Failures**
    - **Issue**: Login requests returning unexpected status codes

@@ -141,7 +141,7 @@ services:
 
 #### Performance Test Execution:
 - **k6 Installation**: Modern GPG keyring installation method
-- **Docker Compose Stack**: Full application environment (app, replit-auth, db)
+- **Docker Compose Stack**: Full application environment (app, db)
 - **Service Health Checks**: Wait for application readiness
 - **Load Test Scenarios**: Authentication, health checks, public APIs
 

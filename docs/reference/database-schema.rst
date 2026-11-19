@@ -436,7 +436,7 @@ Session Storage Table
 
    CREATE INDEX IDX_session_expire ON sessions(expire);
 
-**Purpose**: Required for Replit Auth and session management. This table is mandatory and should not be dropped.
+**Purpose**: Required for session management. This table is mandatory and should not be dropped.
 
 Entity Relationships
 --------------------

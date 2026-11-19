@@ -48,8 +48,5 @@ services:
       - HTTPS=${HTTPS:-true}
       - FORCE_HTTPS=${FORCE_HTTPS:-true}
       - DOMAIN=${DOMAIN:-localhost}
-      - REPL_ID=local-dev-repl
-      - REPLIT_DOMAINS=${DOMAIN:-localhost}
-      - ISSUER_URL=http://replit-auth:3001/oidc
     networks:
       - default

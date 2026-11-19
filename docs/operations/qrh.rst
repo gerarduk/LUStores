@@ -262,40 +262,28 @@ Checklist
 
 ☐ **Step 1**: Verify credentials are correct (try known admin account)
 
-☐ **Step 2**: Check replit-auth service is running::
+☐ **Step 2**: Check the app logs for authentication errors::
 
-    docker compose -f docker-compose.prod.yml ps replit-auth
+    docker compose -f docker-compose.prod.yml logs --tail=50 app
 
-☐ **Step 3**: If not running, restart it::
+☐ **Step 3**: Verify environment configuration::
 
-    docker compose -f docker-compose.prod.yml restart replit-auth
+    # Check SESSION_SECRET and JWT_SECRET are set in .env.prod (should be long random strings)
+    grep -E "SESSION_SECRET|JWT_SECRET" .env.prod
 
-☐ **Step 4**: Check auth service logs::
+☐ **Step 4**: Restart the app::
 
-    docker compose -f docker-compose.prod.yml logs --tail=50 replit-auth
+    docker compose -f docker-compose.prod.yml restart app
 
-☐ **Step 5**: Verify environment configuration::
+☐ **Step 5**: Wait 60 seconds, then test login
 
-    # Check JWT_SECRET is set in .env.prod (should be long random string)
-    grep JWT_SECRET .env.prod
-
-☐ **Step 6**: Test auth service health::
-
-    curl http://localhost:3001/health
-
-☐ **Step 7**: If unhealthy, restart both app and auth::
-
-    docker compose -f docker-compose.prod.yml restart replit-auth app
-
-☐ **Step 8**: Wait 60 seconds, then test login
-
-☐ **Step 9**: If still failing → Check database for user::
+☐ **Step 6**: If still failing → Check database for user::
 
     docker compose -f docker-compose.prod.yml exec db \
         psql -U postgres -d university_inventory \
         -c "SELECT email, role FROM users LIMIT 5;"
 
-☐ **Step 10**: If no users exist, see :doc:`/admin/first-admin-setup`
+☐ **Step 7**: If no users exist, see :doc:`/admin/first-admin-setup`
 
 .. _qrh-database-error:
 
@@ -464,7 +452,7 @@ Checklist
 
     docker compose -f docker-compose.prod.yml logs --tail=100 [SERVICE_NAME]
 
-   Replace [SERVICE_NAME] with: app, db, nginx, replit-auth, redis
+   Replace [SERVICE_NAME] with: app, db, nginx, redis
 
 ☐ **Step 3**: Look for specific error patterns:
 

@@ -78,7 +78,6 @@ env:
   COMPOSE_PROJECT_NAME: 'lustores'
   REGISTRY: docker.io
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/lustores
-  REPLIT_AUTH_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/replitauth
 
 jobs:
   setup:
@@ -110,7 +109,7 @@ jobs:
       - name: Generate Docker cache key
         id: docker-cache-key
         run: |
-          echo "key=${{ runner.os }}-docker-${{ hashFiles('Dockerfile', 'docker-compose.yml', 'package.json', 'docker/replit-auth/Dockerfile', 'docker/replit-auth/package.json') }}" >> $GITHUB_OUTPUT
+          echo "key=${{ runner.os }}-docker-${{ hashFiles('Dockerfile', 'docker-compose.yml', 'package.json') }}" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
         uses: actions/cache@v4
@@ -739,14 +738,6 @@ jobs:
             --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --load .
           
-          # Build replit-auth image
-          docker buildx build \
-            --cache-from=type=local,src=/tmp/.buildx-cache \
-            --cache-to=type=local,dest=/tmp/.buildx-cache-new,mode=max \
-            --tag ${{ env.REGISTRY }}/${{ env.REPLIT_AUTH_IMAGE_NAME }}:latest \
-            --tag ${{ env.REGISTRY }}/${{ env.REPLIT_AUTH_IMAGE_NAME }}:${{ github.sha }} \
-            --load ./docker/replit-auth
-          
           # Build test image if profile exists
           if docker compose --profile testing config > /dev/null 2>&1; then
             docker compose --profile testing build test
@@ -755,11 +746,9 @@ jobs:
       - name: Verify built images
         run: |
           echo "Verifying built images..."
-          docker images | grep -E "${{ env.IMAGE_NAME }}|${{ env.REPLIT_AUTH_IMAGE_NAME }}"
+          docker images | grep -E "${{ env.IMAGE_NAME }}"
           echo "Main LUStores image:"
           docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest --format='{{.Id}}'
-          echo "Replit-auth image:"
-          docker inspect ${{ env.REGISTRY }}/${{ env.REPLIT_AUTH_IMAGE_NAME }}:latest --format='{{.Id}}'
 
       - name: Run Docker tests (if available)
         run: |
@@ -776,10 +765,7 @@ jobs:
             # Push main LUStores image
             docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-            
-            # Push replit-auth image
-            docker push ${{ env.REGISTRY }}/${{ env.REPLIT_AUTH_IMAGE_NAME }}:latest
-            docker push ${{ env.REGISTRY }}/${{ env.REPLIT_AUTH_IMAGE_NAME }}:${{ github.sha }}
+
           else
             echo "Docker Hub credentials not available, skipping push"
           fi

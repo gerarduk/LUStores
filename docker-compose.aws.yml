@@ -14,12 +14,6 @@ services:
       - DATABASE_URL=postgresql://postgres:A1r50ft3r99@database-1:5432/university_inventory
       - SESSION_SECRET=your-secret-key-here
       - DEV_ADMIN_OVERRIDE=true
-      - REPL_ID=local-dev-repl
-      - REPLIT_DOMAINS=localhost:5000
-      - ISSUER_URL=http://replit-auth:3001/oidc
-    depends_on:
-      replit-auth:
-        condition: service_started
     # restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1"]
@@ -27,21 +21,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-  # Local Replit Authentication Service
-  replit-auth:
-    image: st7ma784/replitauth:latest
-    ports:
-      - "3001:3001"
-    environment:
-      - NODE_ENV=development
-      - PORT=3001
-      - JWT_SECRET=local-replit-jwt-secret
-      - ALLOWED_ORIGINS=http://localhost:5000
-    # restart: unless-stopped
-    # profiles:
-    #   - testing
-    #   - integration
-    #   - development
 
  
 

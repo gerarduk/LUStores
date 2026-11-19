@@ -258,7 +258,7 @@ function Generate-DebugReport {
     $report += (Check-ComposeStatus | Out-String)
     
     # Analyze each service
-    $services = @("app", "replit-auth", "db", "redis", "nginx", "certbot", "watchtower", "githubrunner")
+    $services = @("app", "db", "redis", "nginx", "certbot", "watchtower", "githubrunner")
     foreach ($service in $services) {
         $containerName = "$ProjectName-$service-1"
         $containerExists = docker ps -a --format "{{.Names}}" | Where-Object { $_ -eq $containerName }

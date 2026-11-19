@@ -125,13 +125,8 @@ services:
       - FORCE_HTTPS=${FORCE_HTTPS:-true}
       - DOMAIN=${DOMAIN:-localhost}
       - EMAIL=${EMAIL:-admin@localhost}
-      - REPL_ID=${REPL_ID:-prod-repl}
-      - REPLIT_DOMAINS=${REPLIT_DOMAINS}
-      - ISSUER_URL=${ISSUER_URL}
     depends_on:
       db:
-        condition: service_healthy
-      replit-auth:
         condition: service_healthy
     restart: unless-stopped
     volumes:
@@ -148,27 +143,6 @@ services:
       - "com.centurylinklabs.watchtower.enable=true"  # Enable watchtower monitoring
       - "com.centurylinklabs.watchtower.monitor-only=false"  # Allow automatic updates
 
-  replit-auth:
-    image: st7ma784/replitauth:latest
-    ports:
-      - "3001:3001"
-    environment:
-      - PORT=3001
-      - JWT_SECRET=${JWT_SECRET}
-      - ALLOWED_ORIGINS=https://${DOMAIN:-localhost}
-      - NODE_ENV=production
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3001/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    networks:
-      - lustores_network
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"  # Enable watchtower monitoring
-      - "com.centurylinklabs.watchtower.stop-signal=SIGTERM"  # Graceful shutdown signal
 
   # Watchtower for automatic container updates
   watchtower:

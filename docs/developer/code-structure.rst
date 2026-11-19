@@ -40,7 +40,6 @@ The system follows a modern full-stack TypeScript architecture with clear separa
    ├── shared/                   # Shared TypeScript definitions
    │   └── schema.ts             # Database schema and types
    ├── docker/                   # Docker configurations
-   │   └── replit-auth/          # Local authentication service
    ├── performance-tests/        # k6 load testing scripts
    │   └── load-test.js          # Performance test definitions
    ├── scripts/                  # Build and deployment scripts
@@ -343,7 +342,7 @@ Performance Testing
    - **Performance Thresholds**: 95th percentile under 500ms, <10% error rate
 
 **Test Execution Environment:**
-   - Full Docker Compose stack (app, replit-auth, database, redis)
+   - Full Docker Compose stack (app, database, redis)
    - Service health checks and readiness validation
    - Performance metrics collection and dashboard integration
 
@@ -373,7 +372,6 @@ Docker Infrastructure
 
 **Service Components:**
    - **Main Application**: Node.js Express server with React frontend
-   - **Authentication Service**: ``docker/replit-auth/`` local OIDC provider
    - **Database**: PostgreSQL with automated migrations
    - **Redis**: Session storage and caching
    - **pgAdmin**: Database administration interface (development)

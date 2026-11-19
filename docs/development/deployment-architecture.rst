@@ -90,7 +90,7 @@ Development Environment
   - Ports: 5000 (API), 5173 (Vite dev server)
   - Volumes: Source code mounted for hot-reload
   - Environment: ``NODE_ENV=development``, ``DEV_ADMIN_OVERRIDE=true``
-  - Depends on: ``db``, ``replit-auth``
+  - Depends on: ``db``
 
 - **db** (PostgreSQL 15)
   - Port: 5432
@@ -102,11 +102,6 @@ Development Environment
   - Port: 6379
   - Volume: ``redis_data`` for AOF persistence
   - Command: ``redis-server --appendonly yes``
-
-- **replit-auth** (Local auth service)
-  - Port: 3001
-  - Mock authentication for development
-  - Environment: ``JWT_SECRET=local-replit-jwt-secret``
 
 **Test Services** (Profile: ``testing``):
 
@@ -187,11 +182,6 @@ This file extends ``docker-compose.yml`` with production overrides:
   - Authentication: SCRAM-SHA-256
   - PGDATA: Custom location ``/var/lib/postgresql/data/pgdata``
 
-- **replit-auth**:
-  - Image: ``st7ma784/replitauth:latest``
-  - Environment: Production JWT secret
-  - Allowed origins: ``https://${DOMAIN}``
-
 **Network**:
 
 - Custom bridge network: ``lustores_network``
@@ -238,9 +228,8 @@ Docker Build & Push Workflow
 1. **build-and-push**
    - Runs on: ``ubuntu-latest``
    - Uses Docker Buildx for advanced builds
-   - Builds two images:
+   - Builds one image:
      - ``st7ma784/lustores:latest`` (main app)
-     - ``st7ma784/replitauth:latest`` (auth service)
    - Tags:
      - ``latest`` (on main branch)
      - ``main-<git-sha>`` (commit-specific)
@@ -478,11 +467,10 @@ Kubernetes Deployment
    - ``db``: 1 replica (PostgreSQL 17)
    - ``redis``: 1 replica, 256Mi-512Mi RAM
    - ``nginx``: 1 replica (reverse proxy)
-   - ``replit-auth``: 1 replica
    - ``github-runner``: 1 replica (optional, for self-hosted CI)
 4. **Services**:
    - ``nginx``: LoadBalancer (external access)
-   - ``app``, ``db``, ``redis``, ``replit-auth``: ClusterIP (internal)
+   - ``app``, ``db``, ``redis``: ClusterIP (internal)
 5. **ConfigMaps**:
    - ``init-sql-config``: Database schema initialization
    - ``nginx-config``: Nginx reverse proxy configuration
@@ -794,7 +782,6 @@ From ``docker-compose.prod.yml``:
 - ``db`` (PostgreSQL database)
 - ``redis`` (session store)
 - ``nginx`` (reverse proxy)
-- ``replit-auth`` (authentication service)
 
 **Not Monitored**:
 

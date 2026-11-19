@@ -442,17 +442,6 @@ Core Server Files
 Authentication Files
 ~~~~~~~~~~~~~~~~~~~~
 
-**server/replitAuth.ts**
-   - Replit OAuth authentication implementation
-   - OpenID Connect integration
-   - Session management
-   - Token refresh handling
-
-   Key Functions:
-   - ``setupAuth()`` - Initialize authentication
-   - ``isAuthenticated`` - Middleware for protected routes
-   - Session serialization/deserialization
-
 **server/universitySso.ts**
    - SAML 2.0 SSO implementation
    - University identity provider integration

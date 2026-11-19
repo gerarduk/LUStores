@@ -21,7 +21,6 @@ Architecture Diagram
 
                subgraph "Application Layer"
                    APP[LUStores App<br/>st7ma784/lustores:latest<br/>:5000]
-                   AUTH[Replit Auth<br/>st7ma784/replitauth:latest<br/>:3001]
                end
 
                subgraph "Data Layer"
@@ -58,7 +57,6 @@ Architecture Diagram
        APP -->|health checks| NGINX
        APP --> DB
        APP --> REDIS
-       APP --> AUTH
        CERTBOT -->|cert renewal| LETSENCRYPT
        CERTBOT --> CERTBOT_CONF
        CERTBOT --> CERTBOT_WWW
@@ -69,7 +67,6 @@ Architecture Diagram
        REDIS --> REDISVOL
        APP --> LOGS
        WATCHTOWER -->|monitors| APP
-       WATCHTOWER -->|monitors| AUTH
        WATCHTOWER -->|pulls updates| DOCKERHUB
 
 Container Details
@@ -106,7 +103,7 @@ app - Main LUStores Application
   - ``SESSION_SECRET``, ``JWT_SECRET`` - Security keys
   - ``DOMAIN``, ``EMAIL`` - Deployment config
 
-- **Depends On**: ``db`` (healthy), ``replit-auth`` (healthy)
+- **Depends On**: ``db`` (healthy)
 - **Volumes**: ``./logs:/app/logs`` - Application logs
 - **Health Check**: ``wget --spider http://127.0.0.1:5000/health`` every 30s
 - **Restart Policy**: ``unless-stopped``
@@ -144,21 +141,6 @@ redis - Session Store & Cache
 - **Volumes**: ``redis_data:/data`` - Named Docker volume
 - **Command**: ``redis-server --appendonly yes`` - AOF persistence enabled
 - **Restart Policy**: ``unless-stopped``
-
-replit-auth - Authentication Service
--------------------------------------
-
-- **Image**: ``st7ma784/replitauth:latest``
-- **Port**: ``3001:3001``
-- **Environment**:
-
-  - ``PORT=3001``
-  - ``JWT_SECRET=${JWT_SECRET}``
-  - ``ALLOWED_ORIGINS=https://${DOMAIN}``
-
-- **Health Check**: ``wget --spider http://127.0.0.1:3001/health`` every 30s
-- **Restart Policy**: ``unless-stopped``
-- **Labels**: Watchtower enabled with graceful shutdown (``SIGTERM``)
 
 certbot - SSL Certificate Management
 -------------------------------------
@@ -209,7 +191,6 @@ Service Discovery
 Docker DNS automatically resolves container names:
 
 - ``http://app:5000`` - Application
-- ``http://replit-auth:3001`` - Auth service
 - ``postgresql://postgres:${DB_PASSWORD}@db:5432/university_inventory`` - Database
 
 Volume Strategy
@@ -289,11 +270,6 @@ Port Mapping
      - (none)
      - HTTP
      - Internal only (via nginx)
-   * - replit-auth
-     - 3001
-     - 3001
-     - HTTP
-     - Auth service
    * - db
      - 5432
      - 5432
@@ -317,15 +293,12 @@ Data Flow
        participant User
        participant nginx
        participant app
-       participant auth as replit-auth
        participant db as PostgreSQL
        participant redis as Redis
 
        User->>nginx: HTTPS Request :443
        nginx->>nginx: Terminate SSL
        nginx->>app: HTTP Request :5000
-       app->>auth: Validate Token :3001
-       auth-->>app: Token Valid
        app->>db: Query Data :5432
        db-->>app: Return Results
        app->>redis: Cache Session :6379
@@ -366,12 +339,6 @@ All critical services have health checks:
      - 5s
      - 5
      - 30s
-   * - replit-auth
-     - ``wget --spider .../health``
-     - 30s
-     - 10s
-     - 3
-     - 30s
 
 Monitoring Commands
 -------------------
@@ -390,7 +357,6 @@ Automatic Updates (Watchtower)
 Watchtower monitors Docker Hub for new images and automatically updates:
 
 - **app** (``st7ma784/lustores:latest``)
-- **replit-auth** (``st7ma784/replitauth:latest``)
 
 Update Process
 --------------

@@ -620,12 +620,6 @@ spec:
               value: "localhost"
             - name: EMAIL
               value: "admin@localhost"
-            - name: REPL_ID
-              value: "prod-repl"
-            - name: REPLIT_DOMAINS
-              value: ""
-            - name: ISSUER_URL
-              value: ""
             # Connect to primary database (write operations)
             - name: DB_HOST
               value: "db-0.db.lustores.svc.cluster.local"
@@ -685,113 +679,6 @@ spec:
     - protocol: TCP
       port: 5000
       targetPort: 5000
-
----
-
-# Deployment for Replit Auth (2 replicas for redundancy)
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: replit-auth
-  namespace: lustores
-spec:
-  replicas: 2
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-  selector:
-    matchLabels:
-      app: replit-auth
-  template:
-    metadata:
-      labels:
-        app: replit-auth
-    spec:
-      # Pod anti-affinity: spread auth replicas to different nodes
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - replit-auth
-                topologyKey: kubernetes.io/hostname
-        # Prefer worker nodes
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 50
-              preference:
-                matchExpressions:
-                  - key: node-role.kubernetes.io/control-plane
-                    operator: DoesNotExist
-      terminationGracePeriodSeconds: 30
-      containers:
-        - name: replit-auth
-          image: st7ma784/replitauth:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3001
-              name: http
-          env:
-            - name: NODE_ENV
-              value: production
-            - name: PORT
-              value: "3001"
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: app-secret
-                  key: jwt-secret
-            - name: ALLOWED_ORIGINS
-              value: "https://localhost"
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "250m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
-          # Liveness probe
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 3001
-            initialDelaySeconds: 30
-            periodSeconds: 30
-            timeoutSeconds: 10
-            failureThreshold: 3
-          # Readiness probe
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 3001
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 10
-            failureThreshold: 3
-
----
-
-# Service for Replit Auth (load balances across 2 replicas)
-apiVersion: v1
-kind: Service
-metadata:
-  name: replit-auth
-  namespace: lustores
-spec:
-  selector:
-    app: replit-auth
-  ports:
-    - protocol: TCP
-      port: 3001
-      targetPort: 3001
-  type: ClusterIP
 
 ---
 
@@ -989,11 +876,6 @@ data:
             keepalive_timeout 60s;
         }
 
-        upstream replit-auth {
-            server replit-auth:3001 max_fails=3 fail_timeout=30s weight=1;
-            keepalive 32;
-        }
-
         # HTTP server block
         server {
             listen 80;
@@ -1052,19 +934,6 @@ data:
 
                 # Rate limiting
                 limit_req zone=api burst=20 nodelay;
-            }
-
-            # Replit Auth service proxy
-            location /auth/ {
-                proxy_pass http://replit-auth/;
-                proxy_http_version 1.1;
-                proxy_set_header Upgrade $http_upgrade;
-                proxy_set_header Connection 'upgrade';
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                proxy_set_header X-Forwarded-Proto $scheme;
-                proxy_cache_bypass $http_upgrade;
             }
         }
     }

@@ -7,18 +7,19 @@
 Once the GitHub repo is made private, the Docker images should also be private,
 because they contain the built application code.
 
-The images are currently public on Docker Hub:
+The image is currently public on Docker Hub:
 
 - `phyit/lustores`
-- `phyit/replitauth`
 
-These are pulled by `docker-compose.prod.yml` and `docker-compose.aws.yml`, and
+(The old `phyit/replitauth` image is no longer built or used.)
+
+This is pulled by `docker-compose.prod.yml` and `docker-compose.aws.yml`, and
 pushed by `.github/workflows/docker-build-push.yml`.
 
 Options:
 
-1. **Docker Hub, free plan:** only one private repo. Make `lustores` private and
-   keep `replitauth` public, but only if it contains nothing sensitive.
+1. **Docker Hub, free plan:** one private repo, which is now enough because only
+   `lustores` is needed.
 2. **Docker Hub, paid plan (about $9/month):** unlimited private repos. Fewest changes.
 3. **GitHub Container Registry (`ghcr.io`):** free plan includes about 500 MB of
    private storage and 1 GB of downloads a month. Check image sizes first.

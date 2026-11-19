@@ -51,7 +51,6 @@
     "scripts/**/*",
     "tests/**/*",
     "server/vite.ts",
-    "server/replitAuth.ts",
     "server/samlAuth.ts",
     "server/universitySso.ts"
   ]

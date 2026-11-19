@@ -90,7 +90,6 @@ module.exports = {
     '!server/dbInit.ts',
     '!server/backup.ts',
     '!server/samlAuth.ts',
-    '!server/replitAuth.ts',
     '!server/universitySso.ts',
   ],
   coverageDirectory: 'coverage',

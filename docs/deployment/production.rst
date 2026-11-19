@@ -94,11 +94,6 @@ Critical environment variables for production:
    FORCE_HTTPS=true
    DOMAIN=inventory.university.edu
 
-   # OAuth Integration
-   ISSUER_URL=https://your-oauth-provider.edu/oidc
-   CLIENT_ID=your-client-id
-   CLIENT_SECRET=your-client-secret
-
 Load Balancing
 -------------
 

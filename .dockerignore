@@ -16,7 +16,6 @@ dist
 .cache
 
 # Docker build context exclusions
-docker/replit-auth/node_modules/
 docker/*/node_modules/
 
 # Test artifacts

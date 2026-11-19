@@ -28,7 +28,6 @@
     "../dist",
     "../server/__tests__/**/*",
     "../client/**/*",
-    "../vite.config.ts",
-    "../server/replitAuth.ts"
+    "../vite.config.ts"
   ]
 }

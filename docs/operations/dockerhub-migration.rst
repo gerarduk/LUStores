@@ -59,8 +59,6 @@ Gather this information before starting:
      - ``___________________________``
    * - Main app image name
      - ``<username>/lustores`` (or custom name)
-   * - Auth service image name
-     - ``<username>/replitauth`` (or custom name)
 
 Migration Checklist
 ===================
@@ -82,23 +80,14 @@ Update image names in production compose file::
    OLD: image: st7ma784/lustores:latest
    NEW: image: YOUR_DOCKERHUB_USERNAME/lustores:latest
 
-   # Line 149 - Change replit-auth image
-   OLD: image: st7ma784/replitauth:latest
-   NEW: image: YOUR_DOCKERHUB_USERNAME/replitauth:latest
-
 **Exact changes:**
 
 .. code-block:: yaml
-   :emphasize-lines: 2,8
+   :emphasize-lines: 2
 
    # Around line 111
    app:
      image: YOUR_DOCKERHUB_USERNAME/lustores:latest
-     # ... rest of config
-
-   # Around line 149
-   replit-auth:
-     image: YOUR_DOCKERHUB_USERNAME/replitauth:latest
      # ... rest of config
 
 ☐ **Step 1.2: Check other docker-compose files**
@@ -184,10 +173,6 @@ Build both images with new names::
    docker build -t YOUR_DOCKERHUB_USERNAME/lustores:latest \
      --target production .
 
-   # Build replit-auth image
-   docker build -t YOUR_DOCKERHUB_USERNAME/replitauth:latest \
-     ./docker/replit-auth
-
 ☐ **Step 3.3: Tag images**
 
 Create version tags for better tracking::
@@ -195,9 +180,6 @@ Create version tags for better tracking::
    # Tag with version
    docker tag YOUR_DOCKERHUB_USERNAME/lustores:latest \
      YOUR_DOCKERHUB_USERNAME/lustores:v1.0.0
-
-   docker tag YOUR_DOCKERHUB_USERNAME/replitauth:latest \
-     YOUR_DOCKERHUB_USERNAME/replitauth:v1.0.0
 
 ☐ **Step 3.4: Push to new Docker Hub account**
 
@@ -207,17 +189,12 @@ Create version tags for better tracking::
    docker push YOUR_DOCKERHUB_USERNAME/lustores:latest
    docker push YOUR_DOCKERHUB_USERNAME/lustores:v1.0.0
 
-   # Push auth service
-   docker push YOUR_DOCKERHUB_USERNAME/replitauth:latest
-   docker push YOUR_DOCKERHUB_USERNAME/replitauth:v1.0.0
-
 ☐ **Step 3.5: Verify images on Docker Hub**
 
 1. Go to https://hub.docker.com
 2. Navigate to your repositories
 3. Verify you see:
    - ``YOUR_DOCKERHUB_USERNAME/lustores`` with ``latest`` and ``v1.0.0`` tags
-   - ``YOUR_DOCKERHUB_USERNAME/replitauth`` with ``latest`` and ``v1.0.0`` tags
 
 Phase 4: Production Deployment (10 min)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -652,9 +629,7 @@ Quick copy-paste commands for migration:
    # 2. Build and push images
    docker login
    docker build -t YOUR_USERNAME/lustores:latest --target production .
-   docker build -t YOUR_USERNAME/replitauth:latest ./docker/replit-auth
    docker push YOUR_USERNAME/lustores:latest
-   docker push YOUR_USERNAME/replitauth:latest
 
    # 3. Update production
    ssh production-server

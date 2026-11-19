@@ -128,7 +128,6 @@ Edit ``.github/workflows/docker-build-push.yml``:
    env:
      REGISTRY: docker.io
      IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/physicsstores  # Changed from lustores
-     REPLIT_AUTH_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/physicsstores-auth  # Changed from replitauth
 
 Update Main CI/CD Workflow (if needed)
 -------------------------------------
@@ -160,9 +159,6 @@ Edit ``docker-compose.prod.yml``:
    app:
      image: YOUR_DOCKERHUB_USERNAME/physicsstores:latest  # Changed from st7ma784/lustores:latest
 
-   replit-auth:
-     image: YOUR_DOCKERHUB_USERNAME/physicsstores-auth:latest  # Changed from st7ma784/replitauth:latest
-
 Update AWS Docker Compose (if used)
 -----------------------------------
 
@@ -173,9 +169,6 @@ Edit ``docker-compose.aws.yml``:
    # Change these image references:
    app:
      image: YOUR_DOCKERHUB_USERNAME/physicsstores:latest
-
-   replit-auth:
-     image: YOUR_DOCKERHUB_USERNAME/physicsstores-auth:latest
 
 Update Kubernetes Deployment (if used)
 --------------------------------------

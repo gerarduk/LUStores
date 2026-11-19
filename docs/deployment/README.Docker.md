@@ -19,8 +19,6 @@ cp docker-compose.yml docker-compose.production.yml
 # Edit the environment variables in docker-compose.production.yml
 # Set your actual values for:
 # - SESSION_SECRET (generate a secure random string)
-# - REPL_ID (your Replit application ID)
-# - REPLIT_DOMAINS (your domain name)
 ```
 
 2. **Start the services:**
@@ -58,10 +56,7 @@ docker-compose logs -f app
 |----------|-------------|----------|---------|
 | `DATABASE_URL` | PostgreSQL connection string | Yes | Auto-configured |
 | `SESSION_SECRET` | Secret key for sessions | Yes | Must be set |
-| `REPL_ID` | Replit application ID | Yes | Must be set |
-| `REPLIT_DOMAINS` | Comma-separated domains | Yes | Must be set |
 | `NODE_ENV` | Environment mode | No | production |
-| `ISSUER_URL` | OAuth issuer URL | No | https://replit.com/oidc |
 
 ### Database Setup
 
@@ -148,8 +143,6 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://inventory_user:secure_password@db:5432/university_inventory
       - SESSION_SECRET=your-very-secure-random-string-here
-      - REPL_ID=your-actual-repl-id
-      - REPLIT_DOMAINS=yourdomain.com,www.yourdomain.com
     restart: unless-stopped
     depends_on:
       - db
