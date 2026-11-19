@@ -24,7 +24,7 @@ To enable HTTPS:
    - `cert.pem` - SSL certificate
    - `key.pem` - Private key
 
-2. Update docker-compose.aws.yml to use `nginx.conf` instead of `nginx-http.conf`:
+2. Update the nginx service in your Docker Compose file to use `nginx.conf` instead of `nginx-http.conf`:
    ```yaml
    volumes:
      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro

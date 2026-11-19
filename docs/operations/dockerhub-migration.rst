@@ -94,9 +94,6 @@ Update image names in production compose file::
 
 If you use these files, update them too::
 
-   # File: docker-compose.aws.yml (if exists)
-   # Search for st7ma784 and replace with your username
-
    # File: docker-compose.github-runners.yml (if exists)
    # Search for st7ma784 and replace with your username
 
@@ -594,11 +591,8 @@ All Files That Need Updates
      - What to Change
      - Required?
    * - ``docker-compose.prod.yml``
-     - Image names (2 places)
+     - Image name
      - **YES**
-   * - ``docker-compose.aws.yml``
-     - Image names
-     - If you use AWS
    * - GitHub Secrets
      - DOCKERHUB_USERNAME, DOCKERHUB_TOKEN
      - **YES**

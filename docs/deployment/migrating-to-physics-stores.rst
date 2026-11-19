@@ -159,17 +159,6 @@ Edit ``docker-compose.prod.yml``:
    app:
      image: YOUR_DOCKERHUB_USERNAME/physicsstores:latest  # Changed from st7ma784/lustores:latest
 
-Update AWS Docker Compose (if used)
------------------------------------
-
-Edit ``docker-compose.aws.yml``:
-
-.. code-block:: yaml
-
-   # Change these image references:
-   app:
-     image: YOUR_DOCKERHUB_USERNAME/physicsstores:latest
-
 Update Kubernetes Deployment (if used)
 --------------------------------------
 

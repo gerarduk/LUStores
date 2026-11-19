@@ -13,8 +13,7 @@ The image is currently public on Docker Hub:
 
 (The old `phyit/replitauth` image is no longer built or used.)
 
-This is pulled by `docker-compose.prod.yml` and `docker-compose.aws.yml`, and
-pushed by `.github/workflows/docker-build-push.yml`.
+This is pulled by `docker-compose.prod.yml` and pushed by `.github/workflows/docker-build-push.yml`.
 
 Options:
 
