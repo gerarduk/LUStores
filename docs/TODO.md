@@ -9,8 +9,8 @@ because they contain the built application code.
 
 The images are currently public on Docker Hub:
 
-- `st7ma784/lustores`
-- `st7ma784/replitauth`
+- `phyit/lustores`
+- `phyit/replitauth`
 
 These are pulled by `docker-compose.prod.yml` and `docker-compose.aws.yml`, and
 pushed by `.github/workflows/docker-build-push.yml`.
