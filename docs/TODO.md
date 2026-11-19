@@ -39,3 +39,21 @@ to Cloudflare Pages or Netlify instead of GitHub Pages. Optionally protect them
 with Cloudflare Access.
 
 **Status:** agreed, not yet implemented.
+
+
+## Pending work
+
+### Redraw authentication diagrams
+
+The Replit login service (`replit-auth`) has been removed, but two diagrams
+still show it as part of the login flow:
+
+- `diagrams/authentication-flow.md`
+- `diagrams/system-architecture-flow.md`
+
+They need redrawing to show how login actually works now: email/password
+through `server/localAuth.ts` and university SSO through
+`server/universitySso.ts`. Until then they give a misleading picture to
+anyone learning the system.
+
+**Status:** not started.
